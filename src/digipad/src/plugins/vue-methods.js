@@ -34,7 +34,20 @@ Vue.prototype.$formaterDate = function (date, langue) {
 }
 
 Vue.prototype.$formaterDateRelative = function (date, langue) {
-	return moment(date).locale(langue).fromNow()
+	try {
+		const m = moment(date)
+		if (m.isValid() && typeof m.locale === 'function') {
+			const localized = m.locale(langue || 'fr')
+			if (typeof localized.fromNow === 'function') {
+				return localized.fromNow()
+			}
+		}
+		// Fallback si moment ne fonctionne pas correctement
+		return moment(date).format('DD/MM/YYYY HH:mm')
+	} catch (e) {
+		console.warn('Erreur formaterDateRelative:', e)
+		return ''
+	}
 }
 
 Vue.prototype.$verifierEmail = function (email) {
