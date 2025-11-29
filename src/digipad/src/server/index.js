@@ -70,7 +70,7 @@ if (process.env.NODE_ENV === 'production') {
 	}
 }
 const sessionOptions = {
-	secret: process.env.SESSION_KEY,
+	secret: process.env.SESSION_KEY || 'chaipad-default-secret-key-2024',
 	store: new RedisStore(storeOptions),
 	name: 'digipad',
 	resave: false,
