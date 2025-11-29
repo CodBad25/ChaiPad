@@ -1,5 +1,9 @@
 import Vue from 'vue'
 import moment from 'moment'
+import 'moment/locale/fr'
+import 'moment/locale/es'
+import 'moment/locale/it'
+import 'moment/locale/hr'
 
 Vue.prototype.$formaterDate = function (date, langue) {
 	let dateFormattee = ''
