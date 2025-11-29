@@ -1,439 +1,337 @@
-# BalaBox : Outils la digitale (ladigitale.dev)
+# Digipad + Google Classroom
 
-Ce dépôt contient le code source des 8 applications de [ladigitale.dev](https://ladigitale.dev/) suivantes:
+Version personnalisée de [Digipad](https://digipad.app/) avec intégration Google Classroom.
 
-* [Digiboard](https://digiboard.app/)
-* [Digiflashcards](https://ladigitale.dev/digiflashcards/)
-* [Digimindmap](https://ladigitale.dev/digimindmap/)
-* [Digipad](https://digipad.app/)
-* [Digiscreen](https://ladigitale.dev/digiscreen/)
-* [Digisteps](https://ladigitale.dev/digisteps/)
-* [Digistorm](https://digistorm.app/)
-* [Digiwords](https://ladigitale.dev/digiwords/)
+## Fonctionnalités
 
-ainsi qu'une application complementaire:
-* [Etherpad](https://etherpad.org/)
+### Digipad Original
+- Création de murs collaboratifs (pads)
+- Collaboration en temps réel avec Socket.io
+- Support multimédia (images, vidéos, fichiers)
+- Gestion de comptes utilisateurs
+- Partage de pads avec mot de passe
 
-Le tout intégré à la [BalaBox](https://balabox.gitlab.io/balabox/), ainsi que la documentation y afférant.
+### Nouvelles fonctionnalités Google Classroom
 
-Des applications web pour concevoir des tableaux blancs collaboratifs, mutualiser des ressources, scénariser des séances de classe et bien d'autre activités interactives comme des texte à trous, remue-méninges, classement ...
+#### ✅ Implémenté (Backend)
+- Authentification via Google OAuth 2.0
+- Synchronisation des classes Google Classroom
+- Récupération de la liste des étudiants
+- Création de devoirs dans Google Classroom
+- Chiffrement sécurisé des tokens Google (AES-256)
+- Rafraîchissement automatique des tokens
 
-## Liste des fonctionnalités offertes par le projet
+#### 🚧 À implémenter (Frontend)
+- Bouton "Se connecter avec Google" sur la page d'accueil
+- Interface de gestion des classes dans le tableau de bord
+- Modal de partage d'un pad avec une classe Google Classroom
+- Création de devoirs avec un pad directement depuis l'interface
 
-* 9 applications indépendantes et fonctionnant à l'identique aux applications originelles.
+## Architecture
 
-* Aucune utilisation ou traitement d'information personnelle, les 8 applications fonctionne en LAN (indépendamment d'Internet en réseau local).
-
-* Désactivation de certaines fonctionnalités d'intégration pour des services en lignes comme Pixabay ou YouTube.
-
-* Informe le professeur en temps réel de l'utilisation des applications via le [tableau de bord](https://gitlab.com/balabox/board-app).
-
-* Publiée sous licence GNU GPLv3.
-
-## Mise en œuvre du tableau de bord
-
-* Les 9 applications sont conteneurisées via Docker.
-
-* Les 9 applications ont leurs gestions (compilation, conteneurisation, lancement, arrêt, suppression) automatisées par makefile.
-
-* Digiboard, Digipad et Digistorm utilisent le Framework Nuxt.js sur serveur Node.js (express) avec une base de données Redis.
-
-* Les 5 autres applications sont des application hybride entre JavaScript et PHP sur serveur apache avec une base de données SQLite.
-
-* Elle communique avec le [tableau de bord](https://gitlab.com/balabox/board-app) par le biais de JSON envoyé par WebSocket.
-
-# Pour faire pousser sa propre digitale
-
-Pour installer les 9 applications, utilisez le Makefile inclus.
-Il se chargera de la séquence de commandes pour créer, lancer et orchestrer les images et conteneurs Docker !
-
-## Tout d'abord vérifier que vous avez installé toute les dépendances :
-
-* Installer [docker](https://docs.docker.com/engine/install/ubuntu/) :
-```shell
-sudo apt-get update
-
-sudo apt-get install ca-certificates curl gnupg
-
-sudo install -m 0755 -d /etc/apt/keyrings
-
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-
-sudo chmod a+r /etc/apt/keyrings/docker.gpg
-
-echo \
-  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-sudo apt-get update
-
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+digipad-classroom/
+├── README.md                           # Ce fichier
+├── PLAN_INTEGRATION_GOOGLE_CLASSROOM.md # Plan détaillé de l'intégration
+├── GOOGLE_CLASSROOM_SETUP.md           # Guide de configuration Google Cloud
+│
+└── src/digipad/
+    ├── Makefile
+    ├── dockerfile
+    └── src/
+        ├── server/
+        │   ├── index.js                # ✅ Modifié : intégration Passport
+        │   ├── auth/
+        │   │   ├── google.js           # ✅ Nouveau : Config OAuth Google
+        │   │   └── crypto.js           # ✅ Nouveau : Chiffrement tokens
+        │   ├── services/
+        │   │   └── classroom.js        # ✅ Nouveau : Service Classroom API
+        │   └── routes/
+        │       └── google-auth.js      # ✅ Nouveau : Routes API Google
+        │
+        ├── components/                 # 🚧 À créer : composants Vue.js
+        ├── pages/
+        │   ├── index.vue               # 🚧 À modifier : bouton Google
+        │   └── u/_utilisateur.vue      # 🚧 À modifier : section classes
+        │
+        ├── .env                        # ✅ Modifié : credentials Google
+        ├── package.json                # ✅ Modifié : nouvelles dépendances
+        └── nuxt.config.js
 ```
 
-### installer net-tools :
-```shell
-sudo apt install net-tools
+## Installation
+
+### Prérequis
+
+- Node.js v14+ (testé avec v24.11.0)
+- Redis
+- Compte Google Cloud Platform (pour les credentials OAuth)
+
+### 1. Cloner le projet
+
+Le projet est déjà cloné dans :
+```
+~/Documents/digipad-classroom/
 ```
 
-### installer make :
+### 2. Installer Redis
 
-```shell
-sudo apt install make
+```bash
+brew install redis
+brew services start redis
 ```
 
-### Installer le [tableau de bord](https://gitlab.com/balabox/board-app)
-Il est nécessaire pour la stabilité de certaines applications et pour pouvoir suivre en temps réel l'utilisation des applications.
+### 3. Installer les dépendances
 
-Utiliser les commande suivante à la racine du projet:
-
-### Afficher l'aide intégré (en anglais):
-
-```shell
-make help
-```
-
-### Créer le fichier d'initialisation du projet (ladigitale.toml) :
-Contenant les spécification réseau du projet (ports, adresses ip et carte réseau).
-
-* Il est nécessaire pour générer les fichier .env et les commande build et run !
-
-```shell
-make env
-```
-
-### Construire les images :
-
-```shell
-make all 
-make <application>
-```
-
-### Générer les conteneurs:
-* Les commandes compose utillise les fichiers docker-compose.
-* Les commandes run utillisent des commandes docker run standard.
-
-```shell
-make compose_all
-make compose_<application>
-ou
-make run_all
-make run_<application>
-```
-
-Pour installer des outils de La Digitale sur leur propre serveur sans passer par notre makefile et docker ou depuis les sources originales voici la marche à suivre:
-
-* Lisez cet [article](https://ladigitale.dev/blog/pour-faire-pousser-sa-propre-digitale) de ladigitale qui contient des projets pré-compilés.
-* Le [dépôt Codeberg du projet](https://codeberg.org/ladigitale?sort=alphabetically) contenant les codes source des applications.
-
-## Ajout des websocket
-
-### Projets PHP
-
-Ils sont réalisés par l’intégration du fichier recupere_ip.php qui appelle NewWebsocket.js (le php récupère l’ip et le javascipt fait la connexion websocket).
-
-```js
-const ip = "ip";
-const wss = new WebSocket("ws://172.19.0.2:50001")
-
-$('document').ready(function(){
-	$.ajax({
-    	type: 'GET',
-    	url: '../inc/recupere_ip.php',
-    	dataType: 'html',
-    	timeout: 500,
-    	success: function(reponse){
-        	json(reponse);
-    	}
-
-	});
-});
-
-async function json(ip){
-	setInterval(() => {
-    	console.log(ip)
-    	wss.onopen = function (event) { 	 
-        	wss.send(JSON.stringify({ //send a JSON through websocket that contains a list of students and the app they're in
-            	type:"type_eleve",
-            	name:"digiflashcard",
-            	data:{id:ip, name:""}
-        	},
-        	{
-            	type:"integration",
-            	name:"digiboard",
-            	logo:"https://pouet.chapril.org/system/accounts/avatars/000/096/847/original/841401129f94028b.png",
-        	}
-        	));
-    	}
-	}, 10000);
-}
-```
-
-```php
-recupere_ip.php
-<?php
-function getIp(){
-	if(!empty($_SERVER['HTTP_CLIENT_IP'])){
-  	$ip = $_SERVER['HTTP_CLIENT_IP'];
-	}elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
-  	$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-	}else{
-  	$ip = $_SERVER['REMOTE_ADDR'];
-	}
-	return $ip;
-  }
-echo(getIp());
-?>
-```
-### Pour les projet Node.js
-
-il faut inclure dans le fichier server.js (celui ou express met en place le router).
-
-```js
-const WebSocket = require('ws');
-const ws = new WebSocket("ws://webapp:50001")
-let ipUtilisateurs = new Map();
-
-async function envoiejson(){
-	setInterval(() => {
-    	let data = []
-    	ipUtilisateurs.forEach(function(value, key) {
-        	data.push({id:value, name:key})
-    	});
-    	ws.addEventListener("open", () => {
-        	//console.log("Enjoy") //when the connection is opened
-        	ws.send(JSON.stringify({ //send a JSON through websocket that contains a list of students and the app they're in
-            	type:"type_eleve",
-            	name:"digiboard",
-            	data:data
-        	},
-        	{
-            	type:"integration",
-            	name:"digiboard",
-            	logo:"https://pouet.chapril.org/system/accounts/avatars/000/096/847/original/841401129f94028b.png",
-        	}
-        	));
-    
-    	});
-   	 
-	}, 10000);
-}
-
-envoiejson()
-
-app.get('/b/:tableau', function (req) {
-	if (req.session.identifiant === '' || req.session.identifiant === undefined) {
-    	const identifiant = 'u' + Math.random().toString(16).slice(3)
-    	req.session.identifiant = identifiant
-    	req.session.nom = choisirNom() + ' ' + choisirAdjectif()
-    	req.session.langue = 'fr'
-    	req.session.statut = 'participant'
-    	req.session.tableaux = []
-    	req.session.cookie.expires = new Date(Date.now() + dureeSession)
-    	ipUtilisateurs.set(identifiant, req.ip)
-	}
-	req.next()
-})
-
-socket.on('deconnexion', function (tableau) {
-    	ipUtilisateurs.delete(socket.handshake.session.identifiant)
-    	socket.to(tableau).emit('deconnexion', socket.handshake.session.identifiant)
-	})
-```
-
-## Projets hors ladigitale
-
-## Etherpad
-
-[Etherpad](https://etherpad.org/) est une application d’édition de document en ligne collaborative en temps réel, open source et hautement personnalisable.
-
-* Publié sous licence Apache 2.
-
-
-## Projets PHP, serveur apache et base de données SQLite
-
-## Digiflashcards
-
-[Digiflashcards](https://ladigitale.dev/digiflashcards/) est une application web simple pour concevoir des flashcards facilement.
-
-* Publiée sous licence GNU GPLv3.
-* Roboto Slab et Material Icons sous Apache License Version 2.0.
-* KGrotesk sous Sil Open Font Licence 1.1.
-
-## Digimindmap
-
-[Digimindmap](https://ladigitale.dev/digimindmap/) est une application web pour concevoir des cartes heuristiques, basée sur une version personnalisée et allégée de js My Mind.
-
-* Publiée sous licence GNU GPLv3.
-* [librairie js My Mind](https://github.com/ondras/my-mind) sous MIT.
-* Material Icons, Robot Slab sous Apache License Version 2.0.
-* HKGrotesk sous Sil Open Font Licence 1.1.
-
-## Digiscreen
-
-[Digiscreen](https://ladigitale.dev/digiscreen/) est un fond d'écran interactif pour la classe en présence ou à distance.
-Cette version n'intègre pas les clés API Pixabay et Google pour YouTube.
-
-* Publiée sous licence GNU GPLv3.
-* Abril Fat Face, Orbitron et Material Icons sous Apache License Version 2.0.
-* HKGrotesk sous Sil Open Font Licence 1.1.
-* Pictographiques du module Histoire sont la propriété du Gouvernement d'Aragon, créé par Sergio Palao pour [ARASAAC](https://arasaac.org), distribué sous Licence Creative Commons BY-NC-SA.
-
-## Digisteps
-
-[Digisteps](https://ladigitale.dev/digisteps/) est une application web pour concevoir des parcours pédagogiques en ligne.
-
-* Publiée sous licence GNU GPLv3.
-* Roboto Slabet et Material Icons sous Apache License Version 2.0)
-* HKGrotesk sous Sil Open Font Licence 1.1.
-
-## Digiwords
-
-[Digiwords](https://ladigitale.dev/digiwords/) est une application web pour créer des nuages de mots.
-
-* Publiée sous licence GNU GPLv3.
-* Abril Fat Face, Anton, Bahiana, Barrio, Finger Paint, Fredericka The Great, Gloria Hallelujah, Indie Flower, Life Savers, Londrina Sketch, Love Ya Like A Sister, Material Icons, Merienda, Pacifico, Quicksand, Righteous, Roboto et Robot Slab sous Apache License Version 2.0.
-* HKGrotesk eT OpenDyslexic SOUS Sil Open Font Licence 1.1.
-
-## Serveur PHP nécessaire pour l'API
-
-```shell
-php -S 127.0.0.1:8000 (pour le développement uniquement)
-```
-
-## Production
-
-Le dossier src peut être déployé directement sur un serveur PHP avec l'extension SQLite activée.
-
-## Projets Nuxt.js avec serveur Node.js (Express) et base de données Redis
-
-## Digiboard
-
-[Digiboard](https://digiboard.app) est une application web pour concevoir des tableaux blancs collaboratifs.
-
-* Publiée sous licence GNU GPLv3.
-* Material Icons sous Apache License Version 2.0.
-* PHKGrotesk sous Sil Open Font Licence 1.1.
-
-## Digipad
-
-[Digipad](https://digipad.app) est une application web pour concevoir des murs collaboratifs.
-
-* Publiée sous licence GNU GPLv3.
-* Roboto Slab et Material Icons sous Apache License Version 2.0.
-* HKGrotesk sous Sil Open Font Licence 1.1.
-* [jsPanel4](https://github.com/Flyer53/jsPanel4) sous MIT.
-* [pdf.js](https://github.com/mozilla/pdf.js) et [viewer.js](https://github.com/webodf/ViewerJS>) sous Apache License Version 2.0.
-
-## Digistorm
-
-[Digistorm](https://digistorm.app) est une application web pour concevoir des sondages, questionnaires, remue-méninges et nuages de mots collaboratifs.
-
-* Publiée sous licence GNU GPLv3.
-* Roboto Slab et Material Icons sous Apache License Version 2.0.
-* HKGrotesk sous Sil Open Font Licence 1.1.
-
-## Préparation et installation des dépendances
-
-```shell
+```bash
+cd ~/Documents/digipad-classroom/src/digipad/src
 npm install
 ```
 
-## Compilation, minification des fichiers et lancement du serveur de production
+Dépendances ajoutées pour Google Classroom :
+- `passport` : Authentification
+- `passport-google-oauth20` : Stratégie Google OAuth
+- `googleapis` : API Google
+- `crypto-js` : Chiffrement des tokens
 
-### Avec NPM
+### 4. Configurer Google Cloud Platform
 
-```shell
-npm run build
-npm run start
+**Suivez le guide complet** : [GOOGLE_CLASSROOM_SETUP.md](./GOOGLE_CLASSROOM_SETUP.md)
+
+Résumé :
+1. Créer un projet sur Google Cloud Console
+2. Activer Google Classroom API
+3. Configurer l'écran de consentement OAuth
+4. Créer des identifiants OAuth 2.0
+5. Copier Client ID et Client Secret
+
+### 5. Configurer les variables d'environnement
+
+Éditez le fichier `.env` :
+
+```bash
+cd ~/Documents/digipad-classroom/src/digipad/src
+nano .env
 ```
 
-### Avec PM2
+Modifiez ces lignes :
 
-```shell
-npm run build
-pm2 start
+```env
+# Google OAuth & Classroom
+GOOGLE_CLIENT_ID=VOTRE_CLIENT_ID.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=VOTRE_CLIENT_SECRET
+GOOGLE_CALLBACK_URL=http://localhost:3000/auth/google/callback
+GOOGLE_CLASSROOM_ENABLED=true
+ENCRYPTION_KEY=GENERER_UNE_CLE_ALEATOIRE_32_CHARS
 ```
 
-## Variables d'environnement pour la mise en production
-
-Fichier .env à créer à la racine du dossier src.
-
-### Digiboard
-
-```shell
-DOMAIN (protocole + domaine. ex : https://digiboard.app)
-HOST (IP publique du serveur de production)
-PORT (port du serveur local nuxt.js / 3000 par défaut)
-DB_HOST (IP du serveur de base de données Redis)
-DB_PWD (mot de passe de la base de données Redis)
-DB_PORT (port de la base de données Redis / 6379 par défaut)
-SESSION_KEY (clé de session Express Session)
-SESSION_DURATION (durée de la session de connexion des utilisateurs en millisecondes)
+Pour générer une clé de chiffrement :
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-### Digipad
+### 6. Démarrer le serveur
 
-```shell
-DOMAIN (protocole + domaine. ex : https://digipad.app)
-HOST (IP publique du serveur de production)
-PORT (port du serveur local nuxt.js / 3000 par défaut)
-DB_HOST (IP du serveur de base de données Redis)
-DB_PWD (mot de passe de la base de données Redis)
-DB_PORT (port de la base de données Redis / 6379 par défaut)
-SESSION_KEY (clé de session Express Session)
-SESSION_DURATION (durée de la session de connexion des utilisateurs en millisecondes)
-(OPTIONAL)
-ETHERPAD (lien vers un serveur Etherpad pour les documents collaboratifs)
-ETHERPAD_API_KEY (clé API Etherpad)
-UPLOAD_LIMIT (limite de téléversement des fichiers en Mo)
-PAD_LIMIT (nombre maximum de pads par compte utilisateur)
-ADMIN_PASSWORD (mot de passe pour accéder à la page d'administration /admin)
-EMAIL_HOST (hôte pour l'envoi d'emails)
-EMAIL_ADDRESS (adresse pour l'envoi d'emails)
-EMAIL_PASSWORD (mot de passe de l'adresse emails)
-EMAIL_PORT (port pour l'envoi d'emails)
-EMAIL_SECURE (true ou false)
-MATOMO (lien vers un serveur Matomo)
-NFS_PAD_NUMBER (id de pad à partir de laquelle les fichiers seront enregistrés dans un dossier monté NFS - environ 200 000 pour 1 To de capacité disque)
-NFS_FOLDER (nom du dossier monté NFS, obligatoirement situé dans le dossier /static/)
+```bash
+npm run dev
 ```
 
-### Digistorm
+Le serveur démarre sur http://localhost:3000
 
-```shell
-DOMAIN (protocole + domaine. ex : https://digistorm.app)
-HOST (IP publique du serveur de production)
-PORT (port du serveur local nuxt.js / 3000 par défaut)
-DB_HOST (IP publique du serveur de base de données Redis)
-DB_PWD (mot de passe de la base de données Redis)
-DB_PORT (port de la base de données Redis / 6379 par défaut)
-SESSION_KEY (clé de session Express Session)
-SESSION_DURATION (durée de la session de connexion des utilisateurs en millisecondes)
-(OPTIONAL)
-EMAIL_HOST (hôte pour l'envoi d'emails)
-EMAIL_ADDRESS (adresse pour l'envoi d'emails)
-EMAIL_PASSWORD (mot de passe de l'adresse emails)
+## Utilisation
+
+### Authentification Google
+
+#### Méthode 1 : Via l'URL directe (pour tester)
+
+Ouvrez votre navigateur :
+```
+http://localhost:3000/auth/google
 ```
 
-# Remerciements et crédits des applications originelles
+Vous serez redirigé vers Google pour autoriser l'application.
 
-Traduction en allemand lors d'une action dans « la salle des profs » [#twitterlehrerzimmer](https://twitter.com/search?q=%23twitterlehrerzimmer) / [#twlz](https://twitter.com/search?q=%23twlz) par [@uivens](https://twitter.com/uivens) (Ulrich Ivens), [@eBildungslabor](https://twitter.com/eBildungslabor) (Nele Hirsch) et [@teachitalizer](https://twitter.com/teachitalizer) (Holger Skarba).
+#### Méthode 2 : Via le frontend (à implémenter)
 
-Traduction en espagnol par [Fernando S. Delgado Trujillo](https://gitlab.com/fersdt).
+Un bouton "Se connecter avec Google" doit être ajouté sur la page d'accueil.
 
-Traduction en Italien par [Paolo Mauri](https://gitlab.com/maupao) et @nilocram (Roberto Marcolin).
+### API Google Classroom
 
-Traduction en Croate par [Ksenija Lekić](https://gitlab.com/Ksenija66L).
+Une fois authentifié, vous pouvez utiliser ces routes API :
 
-Traduction en néerlandais par Erik Devlies.
+#### Récupérer vos classes
 
-# Remerciements et crédits des sources
+```bash
+curl -X POST http://localhost:3000/api/google/classes \
+  -H "Content-Type: application/json" \
+  -b "digipad=VOTRE_SESSION_COOKIE"
+```
 
-[ladigitale.dev](https://ladigitale.dev/) pour les sources originales des applications, vous pouvez soutenir leur travail [ici](https://opencollective.com/ladigitale).
+#### Récupérer les étudiants d'une classe
 
-[The Etherpad Foundation](https://github.com/ether) pour les sources originales d'Etherpad.
+```bash
+curl -X POST http://localhost:3000/api/google/students \
+  -H "Content-Type: application/json" \
+  -d '{"courseId": "123456789"}' \
+  -b "digipad=VOTRE_SESSION_COOKIE"
+```
 
-[KAZ](https://kaz.bzh/) pour le dockerfile du serveur etherpad.
+#### Créer un devoir
 
-Et enfin Monsieur Merciole pour son aide, ses  précieux conseils ainsi que son chaperonnage du projet et l’organisation des réunions hebdomadaires.
+```bash
+curl -X POST http://localhost:3000/api/google/create-assignment \
+  -H "Content-Type: application/json" \
+  -d '{
+    "courseId": "123456789",
+    "title": "Exercice sur Digipad",
+    "description": "Accédez au pad : http://localhost:3000/p/abc123/token"
+  }' \
+  -b "digipad=VOTRE_SESSION_COOKIE"
+```
+
+## Routes API
+
+### Authentification
+
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| GET | `/auth/google` | Démarre l'authentification Google |
+| GET | `/auth/google/callback` | Callback OAuth (automatique) |
+| POST | `/api/google/disconnect` | Déconnecte le compte Google |
+
+### Google Classroom
+
+| Méthode | Route | Description | Auth requise |
+|---------|-------|-------------|--------------|
+| POST | `/api/google/classes` | Liste les classes de l'enseignant | ✅ |
+| POST | `/api/google/students` | Liste les étudiants d'une classe | ✅ |
+| POST | `/api/google/create-assignment` | Crée un devoir dans Classroom | ✅ |
+
+## Sécurité
+
+### Chiffrement des tokens
+
+Les tokens Google OAuth sont **TOUJOURS chiffrés** avant d'être stockés dans Redis :
+- Algorithme : AES-256
+- Clé : définie dans `ENCRYPTION_KEY` (`.env`)
+- Les tokens ne sont jamais stockés en clair
+
+### Scopes OAuth demandés
+
+L'application demande uniquement les permissions nécessaires :
+- `openid`, `profile`, `email` : Informations de base
+- `classroom.courses.readonly` : Lire les classes (lecture seule)
+- `classroom.rosters.readonly` : Lire les listes d'étudiants (lecture seule)
+- `classroom.coursework.students` : Créer des devoirs
+
+### RGPD
+
+- Les données Google sont stockées dans Redis (local)
+- Les tokens sont chiffrés
+- L'utilisateur peut déconnecter son compte Google à tout moment
+- Suppression des données possible via `/api/google/disconnect`
+
+## Développement
+
+### Structure des fichiers créés/modifiés
+
+#### Backend (✅ Complet)
+
+- [server/auth/google.js](./src/digipad/src/server/auth/google.js) - Configuration Passport Google OAuth
+- [server/auth/crypto.js](./src/digipad/src/server/auth/crypto.js) - Chiffrement/déchiffrement
+- [server/services/classroom.js](./src/digipad/src/server/services/classroom.js) - Service Classroom API
+- [server/routes/google-auth.js](./src/digipad/src/server/routes/google-auth.js) - Routes API
+- [server/index.js](./src/digipad/src/server/index.js) - Intégration Passport (lignes 107-128)
+
+#### Frontend (🚧 À faire)
+
+Composants Vue.js à créer :
+- `components/GoogleLoginButton.vue` - Bouton de connexion Google
+- `components/ClassroomManager.vue` - Gestion des classes
+- `components/ShareWithClassroom.vue` - Modal de partage
+
+Pages à modifier :
+- `pages/index.vue` - Ajouter le bouton Google
+- `pages/u/_utilisateur.vue` - Ajouter la section classes
+
+### Scripts npm
+
+```bash
+npm run dev        # Démarrage en mode développement
+npm run build      # Build pour production
+npm run start      # Démarrage en mode production
+```
+
+## Tests
+
+### Prérequis pour tester
+
+1. Avoir un compte Google
+2. Créer au moins une classe de test sur https://classroom.google.com
+3. Ajouter quelques étudiants fictifs
+
+### Tester l'authentification
+
+1. Allez sur `http://localhost:3000/auth/google`
+2. Autorisez l'application
+3. Vous devriez être redirigé vers `/u/{votre-identifiant}`
+
+### Tester la récupération des classes
+
+Utilisez Postman ou curl après authentification.
+
+## Production
+
+### Avant de déployer en production
+
+1. **Obtenir un domaine** (ex: digipad-ecole.fr)
+2. **Configurer HTTPS** (obligatoire pour OAuth)
+3. **Mettre à jour Google Cloud Console** :
+   - Ajouter le domaine dans "Origines JavaScript autorisées"
+   - Ajouter `https://votre-domaine.com/auth/google/callback` dans "URI de redirection"
+4. **Passer l'app OAuth en mode "Production"**
+5. **Mettre à jour `.env`** :
+   ```env
+   DOMAIN=https://votre-domaine.com
+   GOOGLE_CALLBACK_URL=https://votre-domaine.com/auth/google/callback
+   ```
+6. **Générer une nouvelle clé de chiffrement** pour la production
+
+## Documentation
+
+- [Plan d'intégration détaillé](./PLAN_INTEGRATION_GOOGLE_CLASSROOM.md)
+- [Guide de configuration Google Cloud](./GOOGLE_CLASSROOM_SETUP.md)
+- [Documentation Digipad originale](https://ladigitale.dev/digipad/)
+
+## Licence
+
+GNU GPLv3 - Identique à Digipad original
+
+## Crédits
+
+- **Digipad original** : [La Digitale](https://ladigitale.dev/) - Emmanuel ZIMMERT
+- **Intégration Google Classroom** : Version personnalisée
+
+## Support
+
+- Documentation Google OAuth : https://developers.google.com/identity/protocols/oauth2
+- Documentation Google Classroom API : https://developers.google.com/classroom
+- Code source Digipad : https://codeberg.org/ladigitale/digipad
+
+## Changelog
+
+### Version 0.9.10-classroom (Nov 2025)
+
+#### Ajouté
+- ✅ Authentification Google OAuth 2.0 avec Passport.js
+- ✅ Intégration Google Classroom API
+- ✅ Chiffrement sécurisé des tokens (AES-256)
+- ✅ Routes API pour classes, étudiants, devoirs
+- ✅ Rafraîchissement automatique des tokens
+- ✅ Documentation complète
+
+#### À faire
+- 🚧 Interface frontend (composants Vue.js)
+- 🚧 Bouton connexion Google
+- 🚧 Gestion des classes dans le tableau de bord
+- 🚧 Modal de partage avec Classroom

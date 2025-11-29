@@ -1,16 +1,35 @@
 <template>
 	<main id="page" v-if="identifiant !== '' && statut === 'utilisateur'">
-		<header>
-			<span id="conteneur-logo">
-				<span id="logo" />
-			</span>
-			<span id="titre">{{ $t('monCompte') }}</span>
+		<header class="dashboard-header">
+			<div class="header-left">
+				<a href="/" class="logo-link">
+					<svg class="logo-icon" width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<rect width="40" height="40" rx="8" fill="url(#paint0_linear)"/>
+						<path d="M12 14C12 12.8954 12.8954 12 14 12H18C19.1046 12 20 12.8954 20 14V26C20 27.1046 19.1046 28 18 28H14C12.8954 28 12 27.1046 12 26V14Z" fill="white"/>
+						<path d="M22 14C22 12.8954 22.8954 12 24 12H26C27.1046 12 28 12.8954 28 14V22C28 23.1046 27.1046 24 26 24H24C22.8954 24 22 23.1046 22 22V14Z" fill="white" fill-opacity="0.7"/>
+						<defs>
+							<linearGradient id="paint0_linear" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+								<stop stop-color="#00ced1"/>
+								<stop offset="1" stop-color="#00a5a8"/>
+							</linearGradient>
+						</defs>
+					</svg>
+					<span class="brand-text">ChaiPad</span>
+				</a>
+			</div>
+			<div class="header-center">
+				<h1 class="page-title">{{ $t('monCompte') }}</h1>
+				<span class="welcome-text">Bienvenue, {{ nom || identifiant }}</span>
+			</div>
+			<div class="header-right">
+				<span id="compte" role="button" tabindex="0" :title="$t('parametresCompte')" @click="menu = !menu">
+					<i class="material-icons">settings</i>
+				</span>
+				<span id="deconnexion" role="button" tabindex="0" :title="$t('deconnexion')" @click="deconnexion">
+					<i class="material-icons">logout</i>
+				</span>
+			</div>
 		</header>
-
-		<nav id="nav">
-			<span id="compte" role="button" tabindex="0" :title="$t('parametresCompte')" @click="menu = !menu"><i class="material-icons">account_circle</i></span>
-			<span id="deconnexion" role="button" tabindex="0" :title="$t('deconnexion')" @click="deconnexion"><i class="material-icons">power_settings_new</i></span>
-		</nav>
 
 		<div class="menu gauche" :class="{'ouvert': menu}">
 			<div class="en-tete">
@@ -52,37 +71,74 @@
 			</div>
 		</div>
 
-		<div id="onglets" class="ascenseur">
-			<div class="onglet" :class="{'actif': onglet === 'pads-crees'}" @click="onglet = 'pads-crees'">
-				<span>{{ $t('padsCrees') }}</span>
-				<span class="badge">{{ padsCrees.length }}</span>
-			</div>
-			<div class="onglet" :class="{'actif': onglet === 'pads-rejoints'}" @click="onglet = 'pads-rejoints'">
-				<span>{{ $t('padsRejoints') }}</span>
-				<span class="badge">{{ padsRejoints.length }}</span>
-			</div>
-			<div class="onglet" :class="{'actif': onglet === 'pads-admins'}" @click="onglet = 'pads-admins'">
-				<span>{{ $t('padsAdmins') }}</span>
-				<span class="badge">{{ padsAdmins.length }}</span>
-			</div>
-			<div class="onglet" :class="{'actif': onglet === 'pads-favoris'}" @click="onglet = 'pads-favoris'">
-				<span>{{ $t('favoris') }}</span>
-				<span class="badge">{{ padsFavoris.length }}</span>
-			</div>
-			<div class="onglet" v-for="(item, indexItem) in dossiers" :class="{'actif': onglet === item.id}" @click="onglet = item.id" :key="'dossier_' + indexItem">
-				<span>{{ item.nom }}</span>
-				<span class="badge">{{ item.pads.length }}</span>
-				<div class="menu-dossier">
-					<span role="button" tabindex="0" class="bouton" :title="$t('modifierDossier')" @click="afficherModaleModifierDossier($event, item.id)"><i class="material-icons">edit</i></span>
-					<span role="button" tabindex="0" class="bouton supprimer" :title="$t('supprimerDossier')" @click="afficherModaleConfirmation($event, item.id, 'supprimer-dossier')"><i class="material-icons">delete</i></span>
+		<aside id="onglets" class="ascenseur">
+			<div class="sidebar-section">
+				<span class="section-title">Mes pads</span>
+				<div class="onglet" :class="{'actif': onglet === 'pads-crees'}" @click="onglet = 'pads-crees'">
+					<i class="material-icons tab-icon">dashboard</i>
+					<span class="tab-label">{{ $t('padsCrees') }}</span>
+					<span class="badge">{{ padsCrees.length }}</span>
+				</div>
+				<div class="onglet" :class="{'actif': onglet === 'pads-rejoints'}" @click="onglet = 'pads-rejoints'">
+					<i class="material-icons tab-icon">group</i>
+					<span class="tab-label">{{ $t('padsRejoints') }}</span>
+					<span class="badge">{{ padsRejoints.length }}</span>
+				</div>
+				<div class="onglet" :class="{'actif': onglet === 'pads-admins'}" @click="onglet = 'pads-admins'">
+					<i class="material-icons tab-icon">admin_panel_settings</i>
+					<span class="tab-label">{{ $t('padsAdmins') }}</span>
+					<span class="badge">{{ padsAdmins.length }}</span>
+				</div>
+				<div class="onglet" :class="{'actif': onglet === 'pads-favoris'}" @click="onglet = 'pads-favoris'">
+					<i class="material-icons tab-icon">star</i>
+					<span class="tab-label">{{ $t('favoris') }}</span>
+					<span class="badge">{{ padsFavoris.length }}</span>
 				</div>
 			</div>
-			<span class="bouton-ajouter" role="button" tabindex="0" @click="afficherModaleAjouterDossier">{{ $t('ajouterDossier') }}</span>
+
+			<div class="sidebar-section">
+				<span class="section-title">Integration</span>
+				<div class="onglet onglet-classroom" :class="{'actif': onglet === 'google-classroom'}" @click="onglet = 'google-classroom'">
+					<svg class="tab-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19Z" fill="currentColor"/>
+						<path d="M12 7C10.9 7 10 7.9 10 9C10 10.1 10.9 11 12 11C13.1 11 14 10.1 14 9C14 7.9 13.1 7 12 7Z" fill="currentColor"/>
+						<path d="M12 13C9.33 13 7 14.34 7 16V17H17V16C17 14.34 14.67 13 12 13Z" fill="currentColor"/>
+					</svg>
+					<span class="tab-label">Google Classroom</span>
+				</div>
+			</div>
+
+			<div class="sidebar-section" v-if="dossiers.length > 0">
+				<span class="section-title">Dossiers</span>
+				<div class="onglet" v-for="(item, indexItem) in dossiers" :class="{'actif': onglet === item.id}" @click="onglet = item.id" :key="'dossier_' + indexItem">
+					<i class="material-icons tab-icon">folder</i>
+					<span class="tab-label">{{ item.nom }}</span>
+					<span class="badge">{{ item.pads.length }}</span>
+					<div class="menu-dossier">
+						<span role="button" tabindex="0" class="bouton" :title="$t('modifierDossier')" @click="afficherModaleModifierDossier($event, item.id)"><i class="material-icons">edit</i></span>
+						<span role="button" tabindex="0" class="bouton supprimer" :title="$t('supprimerDossier')" @click="afficherModaleConfirmation($event, item.id, 'supprimer-dossier')"><i class="material-icons">delete</i></span>
+					</div>
+				</div>
+			</div>
+
+			<button class="bouton-ajouter" role="button" tabindex="0" @click="afficherModaleAjouterDossier">
+				<i class="material-icons">create_new_folder</i>
+				{{ $t('ajouterDossier') }}
+			</button>
+		</aside>
+
+		<!-- Section Google Classroom -->
+		<div v-if="onglet === 'google-classroom'" id="google-classroom-section">
+			<ClassroomManager :user-identifiant="$store.state.identifiant" :preselected-pads="selectedPads" @new-pad-created="onNewPadCreated" @pad-shared="onPadShared" />
 		</div>
 
-		<div id="pads" class="ascenseur" :class="affichage">
+		<!-- Section Pads -->
+		<div id="pads" class="ascenseur" :class="affichage" v-if="onglet !== 'google-classroom'">
 			<div class="section">
 				<div id="boutons">
+					<span id="bouton-selectionner" role="button" tabindex="0" :class="{'actif': selectionMode}" :title="selectionMode ? 'Désactiver la sélection' : 'Sélectionner plusieurs pads'" @click="toggleSelectionMode">
+						<i class="material-icons">{{ selectionMode ? 'close' : 'check_box' }}</i>
+					</span>
 					<span id="bouton-creer" :class="{'desactive': padsCrees.length >= limite}" role="button" tabindex="0" @click="afficherModaleCreerPad">{{ $t('creerPad') }}</span>
 					<span id="bouton-importer" :class="{'desactive': padsCrees.length >= limite}" role="button" tabindex="0" @click="afficherModaleImporterPad">{{ $t('importerPad') }}</span>
 				</div>
@@ -114,18 +170,34 @@
 				</div>
 				<div class="pads" v-if="pads.length > 0 && requete === ''">
 					<template v-for="(pad, indexPad) in pads">
-						<div class="pad liste" v-if="affichage === 'liste'" :key="'pad_' + indexPad">
-							<a class="fond" :href="'/p/' + pad.id + '/' + pad.token" :class="{'fond-personnalise': pad.fond.substring(1, 9) === 'fichiers'}" :style="definirFond(pad.fond)" />
-							<a class="meta" :class="{'pad-rejoint': pad.identifiant !== identifiant, 'deplacer': dossiers.length > 0}" :href="'/p/' + pad.id + '/' + pad.token">
+						<div class="pad liste" :class="{'selection-mode': selectionMode, 'selected': isPadSelected(pad.id)}" v-if="affichage === 'liste'" :key="'pad_' + indexPad" @click="selectionMode ? togglePadSelection(pad) : null">
+							<div class="pad-checkbox" v-if="selectionMode" @click.stop="togglePadSelection(pad)">
+								<div class="checkbox" :class="{'checked': isPadSelected(pad.id)}">
+									<i class="material-icons" v-if="isPadSelected(pad.id)">check</i>
+								</div>
+							</div>
+							<a class="fond" :href="selectionMode ? null : '/p/' + pad.id + '/' + pad.token" :class="{'fond-personnalise': pad.fond.substring(1, 9) === 'fichiers'}" :style="definirFond(pad.fond)" @click.prevent="selectionMode ? togglePadSelection(pad) : navigateToPad(pad)" />
+							<a class="meta" :class="{'pad-rejoint': pad.identifiant !== identifiant, 'deplacer': dossiers.length > 0}" :href="selectionMode ? null : '/p/' + pad.id + '/' + pad.token" @click.prevent="selectionMode ? togglePadSelection(pad) : navigateToPad(pad)">
 								<span class="mise-a-jour" v-if="pad.hasOwnProperty('notification') && pad.notification.includes(identifiant)" />
 								<span class="titre">{{ pad.titre }}</span>
+								<span class="google-classroom-badges" v-if="getGoogleClassrooms(pad).length > 0">
+									<span
+										class="google-classroom-badge"
+										v-for="(classroom, classIndex) in getGoogleClassrooms(pad)"
+										:key="'classroom_' + classIndex"
+										:style="{ backgroundColor: classroom.color || '#1967D2' }"
+									>
+										<i class="material-icons">school</i>
+										{{ classroom.name }}
+									</span>
+								</span>
 								<span class="date">{{ $t('creeLe') }} {{ $formaterDate(pad.date, langue) }}</span>
 								<span class="auteur" v-if="pad.identifiant !== identifiant">{{ $t('par') }} {{ pad.identifiant }}</span>
 								<span class="vues" v-if="pad.hasOwnProperty('vues') && pad.vues > 1">- {{ pad.vues }} {{ $t('vues') }}</span>
 								<span class="vues" v-else-if="pad.hasOwnProperty('vues') && pad.vues < 2">- {{ pad.vues }} {{ $t('vue') }}</span>
 								<span class="vues" v-else-if="!pad.hasOwnProperty('vues')">- 0 {{ $t('vue') }}</span>
 							</a>
-							<div class="actions" v-if="pad.identifiant === identifiant">
+							<div class="actions" v-if="pad.identifiant === identifiant && !selectionMode">
 								<span class="ajouter-favori" role="button" tabindex="0" @click="ajouterFavori(pad)" :title="$t('ajouterFavori')" v-if="!favoris.includes(pad.id)"><i class="material-icons">star_outline</i></span>
 								<span class="supprimer-favori" role="button" tabindex="0" @click="supprimerFavori(pad.id)" :title="$t('supprimerFavori')" v-else><i class="material-icons">star</i></span>
 								<span class="deplacer" role="button" tabindex="0" @click="afficherModaleDeplacerPad(pad.id)" :title="$t('ajouterDansDossier')" :class="{'actif': verifierDossierPad(pad.id)}" v-if="dossiers.length > 0"><i class="material-icons">drive_file_move</i></span>
@@ -133,7 +205,7 @@
 								<span class="exporter" role="button" tabindex="0" @click="afficherModaleConfirmation($event, pad.id, 'exporter')" :title="$t('exporterPad')"><i class="material-icons">get_app</i></span>
 								<span class="supprimer" role="button" tabindex="0" @click="afficherModaleConfirmation($event, pad.id, 'supprimer')" :title="$t('supprimerPad')"><i class="material-icons">delete</i></span>
 							</div>
-							<div class="actions" v-else>
+							<div class="actions" v-else-if="!selectionMode">
 								<span class="ajouter-favori" role="button" tabindex="0" @click="ajouterFavori(pad)" :title="$t('ajouterFavori')" v-if="!favoris.includes(pad.id)"><i class="material-icons">star_outline</i></span>
 								<span class="supprimer-favori" role="button" tabindex="0" @click="supprimerFavori(pad.id)" :title="$t('supprimerFavori')" v-else><i class="material-icons">star</i></span>
 								<span class="deplacer" role="button" tabindex="0" @click="afficherModaleDeplacerPad(pad.id)" :title="$t('ajouterDansDossier')" :class="{'actif': verifierDossierPad(pad.id)}" v-if="dossiers.length > 0"><i class="material-icons">drive_file_move</i></span>
@@ -147,6 +219,17 @@
 							<a class="conteneur" :class="{'fond-personnalise': pad.fond.substring(1, 9) === 'fichiers'}" :style="definirFond(pad.fond)" :href="'/p/' + pad.id + '/' + pad.token">
 								<div class="meta">
 									<span class="titre"><span class="mise-a-jour" v-if="pad.hasOwnProperty('notification') && pad.notification.includes(identifiant)" />{{ pad.titre }}</span>
+									<span class="google-classroom-badges" v-if="getGoogleClassrooms(pad).length > 0">
+										<span
+											class="google-classroom-badge"
+											v-for="(classroom, classIndex) in getGoogleClassrooms(pad)"
+											:key="'mosaique_classroom_' + classIndex"
+											:style="{ backgroundColor: classroom.color || '#1967D2' }"
+										>
+											<i class="material-icons">school</i>
+											{{ classroom.name }}
+										</span>
+									</span>
 									<span class="date">{{ $t('creeLe') }} {{ $formaterDate(pad.date, langue) }}</span>
 									<span class="auteur" v-if="pad.identifiant !== identifiant">{{ $t('par') }} {{ pad.identifiant }}</span>
 									<span class="vues" v-if="pad.hasOwnProperty('vues') && pad.vues > 1">- {{ pad.vues }} {{ $t('vues') }}</span>
@@ -186,6 +269,10 @@
 							<a class="meta" :class="{'pad-rejoint': pad.identifiant !== identifiant, 'deplacer': dossiers.length > 0}" :href="'/p/' + pad.id + '/' + pad.token">
 								<span class="mise-a-jour" v-if="pad.hasOwnProperty('notification') && pad.notification.includes(identifiant)" />
 								<span class="titre">{{ pad.titre }}</span>
+								<span class="google-classroom-badge" v-if="pad.googleClassroom">
+									<i class="material-icons">school</i>
+									{{ pad.googleClassroom }}
+								</span>
 								<span class="date">{{ $t('creeLe') }} {{ $formaterDate(pad.date, langue) }}</span>
 								<span class="auteur" v-if="pad.identifiant !== identifiant">{{ $t('par') }} {{ pad.identifiant }}</span>
 								<span class="vues" v-if="pad.hasOwnProperty('vues') && pad.vues > 1">- {{ pad.vues }} {{ $t('vues') }}</span>
@@ -214,6 +301,10 @@
 							<a class="conteneur" :class="{'fond-personnalise': pad.fond.substring(1, 9) === 'fichiers'}" :style="definirFond(pad.fond)" :href="'/p/' + pad.id + '/' + pad.token">
 								<div class="meta">
 									<span class="titre"><span class="mise-a-jour" v-if="pad.hasOwnProperty('notification') && pad.notification.includes(identifiant)" />{{ pad.titre }}</span>
+									<span class="google-classroom-badge" v-if="pad.googleClassroom">
+										<i class="material-icons">school</i>
+										{{ pad.googleClassroom }}
+									</span>
 									<span class="date">{{ $t('creeLe') }} {{ $formaterDate(pad.date, langue) }}</span>
 									<span class="auteur" v-if="pad.identifiant !== identifiant">{{ $t('par') }} {{ pad.identifiant }}</span>
 									<span class="vues" v-if="pad.hasOwnProperty('vues') && pad.vues > 1">- {{ pad.vues }} {{ $t('vues') }}</span>
@@ -412,6 +503,92 @@
 			</div>
 		</div>
 
+		<!-- Barre d'actions pour la sélection multiple -->
+		<div class="selection-action-bar" v-if="selectionMode && selectedPads.length > 0">
+			<div class="selection-info">
+				<span class="count">{{ selectedPads.length }} pad{{ selectedPads.length > 1 ? 's' : '' }} sélectionné{{ selectedPads.length > 1 ? 's' : '' }}</span>
+			</div>
+			<div class="selection-actions">
+				<button class="action-btn select-all" @click="selectAllPads" :title="selectedPads.length === pads.length ? 'Tout désélectionner' : 'Tout sélectionner'">
+					<i class="material-icons">{{ selectedPads.length === pads.length ? 'check_box' : 'check_box_outline_blank' }}</i>
+					<span>{{ selectedPads.length === pads.length ? 'Désélect.' : 'Tout' }}</span>
+				</button>
+				<button class="action-btn favorite" @click="addSelectedToFavorites" title="Ajouter aux favoris">
+					<i class="material-icons">star</i>
+					<span>Favoris</span>
+				</button>
+				<button class="action-btn folder" @click="showMoveToFolderModal" v-if="dossiers.length > 0" title="Déplacer vers un dossier">
+					<i class="material-icons">drive_file_move</i>
+					<span>Dossier</span>
+				</button>
+				<button class="action-btn classroom" @click="shareSelectedToClassroom" title="Partager vers Google Classroom">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19Z" fill="currentColor"/>
+						<path d="M12 7C10.9 7 10 7.9 10 9C10 10.1 10.9 11 12 11C13.1 11 14 10.1 14 9C14 7.9 13.1 7 12 7Z" fill="currentColor"/>
+						<path d="M12 13C9.33 13 7 14.34 7 16V17H17V16C17 14.34 14.67 13 12 13Z" fill="currentColor"/>
+					</svg>
+					<span>Classroom</span>
+				</button>
+				<button class="action-btn delete" @click="confirmDeleteSelected" title="Supprimer les pads sélectionnés">
+					<i class="material-icons">delete</i>
+					<span>Supprimer</span>
+				</button>
+				<button class="action-btn cancel" @click="cancelSelection" title="Annuler la sélection">
+					<i class="material-icons">close</i>
+					<span>Annuler</span>
+				</button>
+			</div>
+		</div>
+
+		<!-- Modal de confirmation de suppression multiple -->
+		<div class="conteneur-modale alerte" v-if="showDeleteConfirmModal">
+			<div class="modale">
+				<div class="conteneur">
+					<div class="contenu">
+						<div class="message">
+							<strong>Supprimer {{ selectedPads.length }} pad{{ selectedPads.length > 1 ? 's' : '' }} ?</strong><br><br>
+							Cette action est irréversible.
+						</div>
+						<div class="actions">
+							<span role="button" tabindex="0" class="bouton" @click="showDeleteConfirmModal = false">Non</span>
+							<span role="button" tabindex="0" class="bouton bouton-danger" @click="deleteSelectedPads">Oui, supprimer</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal de déplacement vers dossier multiple -->
+		<div class="conteneur-modale" v-if="showMoveMultipleModal">
+			<div id="creation" class="modale">
+				<div class="en-tete">
+					<span class="titre">Déplacer {{ selectedPads.length }} pad{{ selectedPads.length > 1 ? 's' : '' }}</span>
+					<span role="button" class="fermer" @click="showMoveMultipleModal = false"><i class="material-icons">close</i></span>
+				</div>
+				<div class="conteneur">
+					<div class="contenu">
+						<label>Choisir un dossier :</label>
+						<select id="champ-dossier-multiple" v-model="selectedFolderForMove">
+							<option value="aucun">Aucun dossier</option>
+							<option v-for="(item, indexItem) in dossiers" :value="item.id" :key="'dossier_move_' + indexItem">{{ item.nom }}</option>
+						</select>
+						<div class="actions">
+							<span role="button" tabindex="0" class="bouton" @click="moveSelectedToFolder">Déplacer</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal de partage rapide vers Google Classroom -->
+		<QuickShareModal
+			v-if="showQuickShareModal"
+			:pads="selectedPads"
+			@close="showQuickShareModal = false"
+			@pad-shared="onPadShared"
+			@shared="onQuickShareComplete"
+		/>
+
 		<chargement :chargement="chargement" v-if="chargement" />
 	</main>
 </template>
@@ -421,11 +598,15 @@ import axios from 'axios'
 import imagesLoaded from 'imagesloaded'
 import saveAs from 'file-saver'
 import chargement from '../../components/chargement.vue'
+import ClassroomManager from '../../components/ClassroomManager.vue'
+import QuickShareModal from '../../components/QuickShareModal.vue'
 
 export default {
 	name: 'Utilisateur',
 	components: {
-		chargement
+		chargement,
+		ClassroomManager,
+		QuickShareModal
 	},
 	async asyncData (context) {
 		const { data } = await axios.post(context.store.state.hote + '/api/recuperer-donnees-utilisateur', {
@@ -470,7 +651,18 @@ export default {
 			dossier: '',
 			dossierId: '',
 			modaleDeplacerPad: false,
-			dossierActuel: {}
+			dossierActuel: {},
+			// Mode sélection multiple
+			selectionMode: false,
+			selectedPads: [],
+			showClassroomShareModal: false,
+			showQuickShareModal: false,
+			classroomClasses: [],
+			loadingClasses: false,
+			// Modales pour actions multiples
+			showDeleteConfirmModal: false,
+			showMoveMultipleModal: false,
+			selectedFolderForMove: 'aucun'
 		}
 	},
 	head () {
@@ -563,12 +755,81 @@ export default {
 		}.bind(this))
 	},
 	methods: {
+		getGoogleClassrooms (pad) {
+			// Nouvelle structure : tableau de classes avec couleurs
+			if (pad.googleClassrooms) {
+				try {
+					return JSON.parse(pad.googleClassrooms)
+				} catch (e) {
+					return []
+				}
+			}
+			// Rétrocompatibilité : ancienne structure avec un seul nom
+			if (pad.googleClassroom) {
+				return [{ name: pad.googleClassroom, color: '#1967D2' }]
+			}
+			return []
+		},
 		definirFond (fond) {
+			// Remplacer les anciens fonds moches par des gradients modernes
+			const oldFondsToGradients = {
+				'/img/fond1.png': 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)',
+				'/img/fond2.png': 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
+				'/img/fond3.png': 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
+				'/img/fond4.png': 'linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%)',
+				'/img/fond5.png': 'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)',
+				'/img/fond6.png': 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)',
+				'/img/fond7.png': 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)',
+				'/img/fond8.png': 'linear-gradient(135deg, #84cc16 0%, #a3e635 100%)',
+				'/img/fond9.png': 'linear-gradient(135deg, #eab308 0%, #facc15 100%)',
+				'/img/fond10.png': 'linear-gradient(135deg, #22c55e 0%, #4ade80 100%)',
+				'/img/fond11.png': 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)'
+			}
+
+			if (oldFondsToGradients[fond]) {
+				return { background: oldFondsToGradients[fond] }
+			}
+
 			if (fond.substring(0, 1) === '#') {
-				return { backgroundColor: fond }
+				// Transformer les couleurs plates en gradients modernes
+				const gradients = {
+					'#001d1d': 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+					'#ff6259': 'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)',
+					'#ffce00': 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+					'#00ced1': 'linear-gradient(135deg, #0891b2 0%, #22d3d8 100%)',
+					'#0891b2': 'linear-gradient(135deg, #0891b2 0%, #22d3d8 100%)',
+					'#e32f6c': 'linear-gradient(135deg, #db2777 0%, #f472b6 100%)',
+					// Couleurs Google Classroom
+					'#1967D2': 'linear-gradient(135deg, #1967D2 0%, #4285f4 100%)', // Bleu Google
+					'#1E8E3E': 'linear-gradient(135deg, #1E8E3E 0%, #34a853 100%)', // Vert
+					'#E8710A': 'linear-gradient(135deg, #E8710A 0%, #fbbc04 100%)', // Orange
+					'#D93025': 'linear-gradient(135deg, #D93025 0%, #ea4335 100%)', // Rouge
+					'#9334E6': 'linear-gradient(135deg, #9334E6 0%, #a855f7 100%)', // Violet
+					'#12B5CB': 'linear-gradient(135deg, #12B5CB 0%, #22d3ee 100%)', // Cyan
+					'#E52592': 'linear-gradient(135deg, #E52592 0%, #ec4899 100%)', // Rose
+					'#F9AB00': 'linear-gradient(135deg, #F9AB00 0%, #fbbf24 100%)', // Jaune
+					'#1A73E8': 'linear-gradient(135deg, #1A73E8 0%, #60a5fa 100%)', // Bleu clair
+					'#34A853': 'linear-gradient(135deg, #34A853 0%, #4ade80 100%)', // Vert clair
+					'#EA8600': 'linear-gradient(135deg, #EA8600 0%, #fbbf24 100%)', // Orange clair
+					'#C5221F': 'linear-gradient(135deg, #C5221F 0%, #f87171 100%)' // Rouge foncé
+				}
+				if (gradients[fond]) {
+					return { background: gradients[fond] }
+				}
+				// Creer un gradient subtil a partir de la couleur
+				return { background: `linear-gradient(135deg, ${fond} 0%, ${this.lightenColor(fond, 15)} 100%)` }
 			} else {
 				return { backgroundImage: 'url(' + fond + ')' }
 			}
+		},
+		lightenColor (hex, percent) {
+			// Convertir hex en RGB et eclaircir
+			const num = parseInt(hex.replace('#', ''), 16)
+			const amt = Math.round(2.55 * percent)
+			const R = Math.min(255, (num >> 16) + amt)
+			const G = Math.min(255, ((num >> 8) & 0x00FF) + amt)
+			const B = Math.min(255, (num & 0x0000FF) + amt)
+			return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)
 		},
 		afficherModaleCreerPad () {
 			if (this.padsCrees.length < this.limite) {
@@ -603,6 +864,213 @@ export default {
 		fermerModaleCreerPad () {
 			this.modaleCreerPad = false
 			this.titre = ''
+		},
+		onNewPadCreated (pad) {
+			// Ajouter le nouveau pad à la liste des pads créés
+			if (pad && pad.id) {
+				this.padsCrees.push(pad)
+			}
+		},
+		onPadShared (shareInfo) {
+			// Mettre à jour le pad localement avec les infos de la classe partagée
+			const { padId, courseId, courseName, courseColor } = shareInfo
+
+			// Chercher le pad dans padsCrees
+			const pad = this.padsCrees.find(p => p.id === padId)
+			if (pad) {
+				// Parser les classes existantes ou créer un tableau vide
+				let classrooms = []
+				if (pad.googleClassrooms) {
+					try {
+						classrooms = JSON.parse(pad.googleClassrooms)
+					} catch (e) {
+						classrooms = []
+					}
+				} else if (pad.googleClassroom) {
+					// Rétrocompatibilité : convertir l'ancienne structure
+					classrooms = [{ name: pad.googleClassroom, color: '#1967D2' }]
+				}
+
+				// Ajouter la nouvelle classe si elle n'existe pas déjà
+				const alreadyAdded = classrooms.some(c => c.courseId === courseId)
+				if (!alreadyAdded) {
+					classrooms.push({
+						courseId: courseId,
+						name: courseName,
+						color: courseColor || '#1967D2'
+					})
+				}
+
+				// Mettre à jour le pad localement
+				this.$set(pad, 'googleClassrooms', JSON.stringify(classrooms))
+				this.$set(pad, 'googleClassroom', courseName) // Rétrocompatibilité
+			}
+		},
+		onQuickShareComplete (shareResult) {
+			// Fermer le modal et désactiver le mode sélection
+			this.showQuickShareModal = false
+			this.selectionMode = false
+			this.selectedPads = []
+
+			// Afficher un message de confirmation
+			const count = shareResult.count || 0
+			const classesCount = shareResult.classes?.length || 0
+			if (count > 0) {
+				this.$store.commit('modifierNotification', {
+					type: 'reussite',
+					message: `${count} pad(s) partagé(s) vers ${classesCount} classe(s)`
+				})
+			}
+		},
+		// Méthodes pour la sélection multiple
+		toggleSelectionMode () {
+			this.selectionMode = !this.selectionMode
+			if (!this.selectionMode) {
+				this.selectedPads = []
+			}
+		},
+		isPadSelected (padId) {
+			return this.selectedPads.some(p => p.id === padId)
+		},
+		togglePadSelection (pad) {
+			const index = this.selectedPads.findIndex(p => p.id === pad.id)
+			if (index === -1) {
+				this.selectedPads.push(pad)
+			} else {
+				this.selectedPads.splice(index, 1)
+			}
+		},
+		navigateToPad (pad) {
+			this.$router.push('/p/' + pad.id + '/' + pad.token)
+		},
+		selectAllPads () {
+			if (this.selectedPads.length === this.pads.length) {
+				this.selectedPads = []
+			} else {
+				this.selectedPads = [...this.pads]
+			}
+		},
+		cancelSelection () {
+			this.selectionMode = false
+			this.selectedPads = []
+		},
+		shareSelectedToClassroom () {
+			// Ouvrir le modal de partage rapide
+			this.showQuickShareModal = true
+		},
+		// Actions multiples
+		addSelectedToFavorites () {
+			const padsToAdd = this.selectedPads.filter(pad => !this.favoris.includes(pad.id))
+			if (padsToAdd.length === 0) {
+				this.$store.dispatch('modifierMessage', 'Tous les pads sélectionnés sont déjà en favoris')
+				return
+			}
+			padsToAdd.forEach((pad) => {
+				this.ajouterFavori(pad)
+			})
+			this.$store.dispatch('modifierMessage', `${padsToAdd.length} pad${padsToAdd.length > 1 ? 's ajoutés' : ' ajouté'} aux favoris`)
+			this.cancelSelection()
+		},
+		showMoveToFolderModal () {
+			this.selectedFolderForMove = 'aucun'
+			this.showMoveMultipleModal = true
+		},
+		moveSelectedToFolder () {
+			const dossierId = this.selectedFolderForMove
+			const padsToMove = this.selectedPads.filter(pad => pad.identifiant === this.identifiant)
+
+			if (padsToMove.length === 0) {
+				this.$store.dispatch('modifierAlerte', 'Vous ne pouvez déplacer que vos propres pads')
+				return
+			}
+
+			// Retirer les pads des dossiers existants
+			this.dossiers.forEach((dossier) => {
+				padsToMove.forEach((pad) => {
+					const index = dossier.pads.indexOf(pad.id)
+					if (index > -1) {
+						dossier.pads.splice(index, 1)
+					}
+				})
+			})
+
+			// Ajouter au nouveau dossier si ce n'est pas "aucun"
+			if (dossierId !== 'aucun') {
+				const dossierCible = this.dossiers.find(d => d.id === dossierId)
+				if (dossierCible) {
+					padsToMove.forEach((pad) => {
+						if (!dossierCible.pads.includes(pad.id)) {
+							dossierCible.pads.push(pad.id)
+						}
+					})
+				}
+			}
+
+			// Sauvegarder les dossiers
+			axios.post(this.hote + '/api/modifier-dossiers', {
+				identifiant: this.identifiant,
+				dossiers: JSON.stringify(this.dossiers)
+			}).then(() => {
+				const message = dossierId === 'aucun'
+					? `${padsToMove.length} pad${padsToMove.length > 1 ? 's retirés' : ' retiré'} des dossiers`
+					: `${padsToMove.length} pad${padsToMove.length > 1 ? 's déplacés' : ' déplacé'}`
+				this.$store.dispatch('modifierMessage', message)
+			}).catch(() => {
+				this.$store.dispatch('modifierAlerte', 'Erreur lors du déplacement')
+			})
+
+			this.showMoveMultipleModal = false
+			this.cancelSelection()
+		},
+		confirmDeleteSelected () {
+			// Vérifier que l'utilisateur possède les pads
+			const ownedPads = this.selectedPads.filter(pad => pad.identifiant === this.identifiant)
+			if (ownedPads.length === 0) {
+				this.$store.dispatch('modifierAlerte', 'Vous ne pouvez supprimer que vos propres pads')
+				return
+			}
+			if (ownedPads.length < this.selectedPads.length) {
+				this.$store.dispatch('modifierAlerte', `Seuls ${ownedPads.length} pad${ownedPads.length > 1 ? 's vous appartenant seront supprimés' : ' vous appartenant sera supprimé'}`)
+			}
+			this.showDeleteConfirmModal = true
+		},
+		deleteSelectedPads () {
+			const padsToDelete = this.selectedPads.filter(pad => pad.identifiant === this.identifiant)
+			let deleted = 0
+
+			padsToDelete.forEach((pad) => {
+				axios.post(this.hote + '/api/supprimer-pad', {
+					padId: pad.id,
+					identifiant: this.identifiant
+				}).then(() => {
+					// Retirer de la liste des pads créés
+					const index = this.padsCrees.findIndex(p => p.id === pad.id)
+					if (index > -1) {
+						this.padsCrees.splice(index, 1)
+					}
+					// Retirer des dossiers
+					this.dossiers.forEach((dossier) => {
+						const dossierIndex = dossier.pads.indexOf(pad.id)
+						if (dossierIndex > -1) {
+							dossier.pads.splice(dossierIndex, 1)
+						}
+					})
+					// Retirer des favoris
+					const favIndex = this.favoris.indexOf(pad.id)
+					if (favIndex > -1) {
+						this.favoris.splice(favIndex, 1)
+					}
+					deleted++
+					if (deleted === padsToDelete.length) {
+						this.$store.dispatch('modifierMessage', `${deleted} pad${deleted > 1 ? 's supprimés' : ' supprimé'}`)
+					}
+				}).catch(() => {
+					this.$store.dispatch('modifierAlerte', 'Erreur lors de la suppression')
+				})
+			})
+
+			this.showDeleteConfirmModal = false
+			this.cancelSelection()
 		},
 		afficherModaleImporterPad () {
 			if (this.padsCrees.length < this.limite) {
@@ -1263,13 +1731,133 @@ export default {
 #page {
 	width: 100%;
 	height: 100%;
+	background: #f8fafc;
+}
+
+/* Header modernisé */
+.dashboard-header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 4rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 2rem;
+	background: white;
+	border-bottom: 1px solid #e2e8f0;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	z-index: 100;
+}
+
+.header-left {
+	display: flex;
+	align-items: center;
+}
+
+.logo-link {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	text-decoration: none;
+	color: inherit;
+}
+
+.logo-icon {
+	width: 32px;
+	height: 32px;
+}
+
+.brand-text {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #0f172a;
+}
+
+.header-center {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.page-title {
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: #0f172a;
+	margin: 0;
+}
+
+.welcome-text {
+	font-size: 0.75rem;
+	color: #64748b;
+}
+
+.header-right {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.header-right span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.2s;
+	color: #64748b;
+}
+
+.header-right span:hover {
+	background: #f1f5f9;
+	color: #0f172a;
+}
+
+.header-right #deconnexion:hover {
+	background: #fef2f2;
+	color: #ef4444;
 }
 
 #boutons {
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
-	margin-bottom: 1.5rem;
+	gap: 1rem;
+	margin-bottom: 2rem;
+	align-items: center;
+}
+
+#bouton-selectionner {
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	width: 44px;
+	height: 44px;
+	background: white;
+	border: 2px solid #e2e8f0;
+	border-radius: 0.75rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	color: #64748b;
+}
+
+#bouton-selectionner:hover {
+	border-color: #00ced1;
+	color: #00ced1;
+	background: #f0fdfa;
+}
+
+#bouton-selectionner.actif {
+	background: #00ced1;
+	border-color: #00ced1;
+	color: white;
+}
+
+#bouton-selectionner i {
+	font-size: 1.25rem;
 }
 
 #bouton-importer,
@@ -1277,45 +1865,52 @@ export default {
 	display: inline-flex;
 	justify-content: center;
 	align-items: center;
-	width: 220px;
-    line-height: 1;
-    font-size: 1.6rem;
-    font-weight: 700;
-    text-transform: uppercase;
-	padding: 1em 1.5em;
-    border: 2px solid #00ced1;
-	border-radius: 2em;
-	margin-bottom: 1.5rem;
-	background: #46fbff;
+	min-width: 180px;
+	line-height: 1;
+	font-size: 0.875rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.025em;
+	padding: 0.875rem 1.5rem;
+	border: none;
+	border-radius: 0.75rem;
 	cursor: pointer;
-    transition: all 0.1s ease-in;
+	transition: all 0.2s ease;
 	text-align: center;
+}
+
+#bouton-creer {
+	background: linear-gradient(135deg, #00ced1, #00a5a8);
+	color: white;
+	box-shadow: 0 4px 14px rgba(0, 206, 209, 0.35);
+}
+
+#bouton-creer:not(.desactive):hover {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(0, 206, 209, 0.45);
+}
+
+#bouton-importer {
+	background: white;
+	color: #0f172a;
+	border: 2px solid #e2e8f0;
+}
+
+#bouton-importer:not(.desactive):hover {
+	border-color: #00ced1;
+	background: #f0fdfa;
 }
 
 #bouton-importer.desactive,
 #bouton-creer.desactive {
-	border: 2px solid #777;
-	background: #aaa;
+	background: #e2e8f0;
+	color: #94a3b8;
+	box-shadow: none;
 	cursor: default;
 }
 
-#bouton-creer {
-	margin-right: 1.5rem;
-}
-
-#bouton-importer:not(.desactive):hover,
-#bouton-creer:not(.desactive):hover {
-	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
-	background: #fff;
-}
-
 #identifiant {
-	background: #e9e9e9;
-}
-
-#deconnexion {
-	color: #ff6259;
-	margin-bottom: 3rem;
+	background: #f1f5f9;
 }
 
 .menu .bouton-rouge,
@@ -1327,76 +1922,121 @@ export default {
 	margin-bottom: 3rem;
 }
 
+/* Sidebar modernisée */
 #onglets {
-	position: absolute;
-    top: 4rem;
-	left: 4rem;
-    height: calc(100% - 4rem);
-	width: 30rem;
-	padding: 3rem 1.5rem;
-	border-right: 1px solid #ddd;
+	position: fixed;
+	top: 4rem;
+	left: 0;
+	height: calc(100% - 4rem);
+	width: 16rem;
+	padding: 1.5rem 1rem;
+	background: white;
+	border-right: 1px solid #e2e8f0;
 	overflow: auto;
 	-webkit-overflow-scrolling: touch;
 }
 
+.sidebar-section {
+	margin-bottom: 1.5rem;
+}
+
+.section-title {
+	display: block;
+	font-size: 0.7rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: #94a3b8;
+	padding: 0 0.75rem;
+	margin-bottom: 0.5rem;
+}
+
 #onglets .onglet {
 	position: relative;
-	display: block;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
 	text-align: left;
-	padding-bottom: 0.5rem;
-	margin-bottom: 2rem;
-	font-size: 1.8rem;
-	border-bottom: 3px solid transparent;
+	padding: 0.625rem 0.75rem;
+	margin-bottom: 0.25rem;
+	font-size: 0.875rem;
+	border-radius: 0.5rem;
 	cursor: pointer;
+	transition: all 0.15s ease;
+	color: #475569;
+}
+
+#onglets .onglet:hover {
+	background: #f1f5f9;
+	color: #0f172a;
 }
 
 #onglets .onglet.actif {
-	font-weight: 700;
-	border-bottom: 3px solid #00ced1;
+	background: linear-gradient(135deg, rgba(0, 206, 209, 0.15), rgba(0, 165, 168, 0.1));
+	color: #0891b2;
+	font-weight: 600;
+}
+
+#onglets .onglet .tab-icon {
+	font-size: 1.125rem;
+	opacity: 0.7;
+}
+
+#onglets .onglet.actif .tab-icon {
+	opacity: 1;
+}
+
+#onglets .onglet .tab-label {
+	flex: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 #onglets .bouton-ajouter {
-	display: inline-block;
-	font-weight: 700;
-	font-size: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	width: 100%;
+	font-weight: 600;
+	font-size: 0.75rem;
 	text-transform: uppercase;
-	height: 32px;
-	line-height: 32px;
-	padding: 0 20px;
+	letter-spacing: 0.025em;
+	padding: 0.75rem 1rem;
 	cursor: pointer;
-	color: #001d1d;
-	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
-	background: #00ced1;
-	border-radius: 5px;
-	letter-spacing: 1px;
-	text-indent: 1px;
-	text-align: center;
-	transition: all 0.1s ease-in;
-	white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%;
-	margin-bottom: 3rem;
+	color: #64748b;
+	background: #f8fafc;
+	border: 2px dashed #e2e8f0;
+	border-radius: 0.5rem;
+	transition: all 0.2s ease;
+	margin-top: 1rem;
 }
 
 #onglets .bouton-ajouter:hover {
-	color: #fff;
-	background: #001d1d;
+	color: #0891b2;
+	background: #f0fdfa;
+	border-color: #0891b2;
+}
+
+#onglets .bouton-ajouter i {
+	font-size: 1rem;
 }
 
 #onglets .onglet .menu-dossier {
 	visibility: hidden;
 	position: absolute;
 	color: #fff;
-	top: 0;
-	right: 0;
+	top: 50%;
+	right: 0.5rem;
+	transform: translateY(-50%);
 	line-height: 1;
-	font-size: 24px;
-	padding: 3px 1rem;
-	background: rgba(0, 0, 0, 0.25);
+	font-size: 18px;
+	padding: 0.25rem 0.5rem;
+	background: rgba(0, 0, 0, 0.6);
 	border-radius: 4px;
 	opacity: 0;
-	transition: opacity 0.25s ease-in-out;
+	transition: opacity 0.2s ease;
 }
 
 #onglets .onglet:hover .menu-dossier {
@@ -1410,112 +2050,177 @@ export default {
 }
 
 #onglets .onglet .menu-dossier span + span {
-	margin-left: 0.7rem;
-}
-
-#onglets .onglet > span {
-	vertical-align: middle;
+	margin-left: 0.5rem;
 }
 
 #onglets .onglet .badge {
-	display: inline-block;
-	width: 2rem;
-	height: 2rem;
-	background: #e32f6c;
-	border-radius: 50%;
-	font-size: 1.2rem;
-	color: #fff;
-	line-height: 2rem;
-	text-align: center;
-	vertical-align: middle;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.375rem;
+	height: 1.375rem;
+	padding: 0 0.375rem;
+	background: #f1f5f9;
+	border-radius: 0.375rem;
+	font-size: 0.7rem;
+	font-weight: 600;
+	color: #64748b;
+}
+
+#onglets .onglet.actif .badge {
+	background: rgba(0, 206, 209, 0.2);
+	color: #0891b2;
+}
+
+#onglets .onglet.onglet-classroom {
+	color: #1967D2;
+	background: rgba(25, 103, 210, 0.08);
+}
+
+#onglets .onglet.onglet-classroom:hover {
+	background: rgba(25, 103, 210, 0.12);
+}
+
+#onglets .onglet.onglet-classroom.actif {
+	background: rgba(25, 103, 210, 0.15);
+	font-weight: 600;
+}
+
+#onglets .onglet.onglet-classroom .tab-icon-svg {
+	flex-shrink: 0;
+	opacity: 0.85;
+}
+
+/* Sections principales */
+#google-classroom-section {
+	position: fixed;
+	top: 4rem;
+	left: 16rem;
+	padding: 2rem;
+	height: calc(100% - 4rem);
+	width: calc(100% - 16rem);
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	background: #f8fafc;
 }
 
 #pads {
-	position: absolute;
-    top: 4rem;
-	left: 34rem;
-	padding: 3rem 1.5rem;
+	position: fixed;
+	top: 4rem;
+	left: 16rem;
+	padding: 2rem;
 	height: calc(100% - 4rem);
-	width: calc(100% - 34rem);
+	width: calc(100% - 16rem);
 	overflow: auto;
 	-webkit-overflow-scrolling: touch;
+	background: #f8fafc;
 }
 
 #pads.liste {
-	padding: 3rem 1.5rem;
+	padding: 2rem;
 }
 
 #pads.mosaique {
-	padding: 3rem 0.75rem;
+	padding: 2rem 1rem;
 }
 
 .vide {
 	text-align: center;
-	font-size: 1.7rem;
-    padding: 2.5rem 0;
-    border-top: 1px dotted #ddd;
-    border-bottom: 1px dotted #ddd;
-    margin: 0 0 3rem;
+	font-size: 1rem;
+	padding: 3rem 2rem;
+	background: white;
+	border: 2px dashed #e2e8f0;
+	border-radius: 1rem;
+	color: #64748b;
+	margin: 0 0 2rem;
 }
 
+/* Filtres modernisés */
 #filtrer {
 	display: flex;
-	justify-content: flex-end;
+	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 3rem;
+	margin-bottom: 1.5rem;
 	width: 100%;
-	font-size: 0;
+	gap: 1rem;
+	flex-wrap: wrap;
 }
 
 .mosaique #actions-dossier,
 .mosaique #filtrer {
-	padding: 0 0.75rem;
+	padding: 0;
 }
 
 #filtrer .rechercher,
 #filtrer .filtrer {
 	display: flex;
 	align-items: center;
-	width: calc(50% - (24px + 2.5rem));
-}
-
-#filtrer .filtrer,
-#filtrer .rechercher {
-	margin-right: 2rem;
+	flex: 1;
+	min-width: 200px;
+	max-width: 300px;
 }
 
 #filtrer .afficher span,
 #filtrer .filtrer span,
 #filtrer .rechercher span {
-	font-size: 24px;
-	margin-right: 1rem;
+	font-size: 20px;
+	margin-right: 0.75rem;
+	color: #64748b;
 }
 
 #filtrer .filtrer select,
 #filtrer .rechercher input {
-	width: calc(100% - (24px + 1rem));
+	flex: 1;
 }
 
 #filtrer select,
 #filtrer input[type="search"] {
-	font-size: 16px;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	padding: 1rem 1.5rem;
+	font-size: 0.875rem;
+	border: 1px solid #e2e8f0;
+	border-radius: 0.5rem;
+	padding: 0.625rem 1rem;
 	text-align: left;
+	background: white;
+	transition: all 0.2s;
+}
+
+#filtrer select:focus,
+#filtrer input[type="search"]:focus {
+	outline: none;
+	border-color: #00ced1;
+	box-shadow: 0 0 0 3px rgba(0, 206, 209, 0.1);
 }
 
 #filtrer select {
-	background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 0 29 14" width="29"><path fill="%23000000" d="M9.37727 3.625l5.08154 6.93523L19.54036 3.625" /></svg>') center right no-repeat;
-	padding-right: 3rem;
-}
-
-#filtrer .afficher span {
+	background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 0 29 14" width="29"><path fill="%2364748b" d="M9.37727 3.625l5.08154 6.93523L19.54036 3.625" /></svg>') center right 10px no-repeat;
+	padding-right: 2.5rem;
 	cursor: pointer;
 }
 
-#filtrer .afficher span:last-child {
-	margin-right: 0;
+#filtrer .afficher {
+	display: flex;
+	gap: 0.25rem;
+	background: white;
+	padding: 0.25rem;
+	border-radius: 0.5rem;
+	border: 1px solid #e2e8f0;
+}
+
+#filtrer .afficher span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	margin: 0;
+	border-radius: 0.375rem;
+	cursor: pointer;
+	transition: all 0.15s;
+}
+
+#filtrer .afficher span:hover {
+	background: #f1f5f9;
+	color: #0f172a;
 }
 
 #actions-dossier {
@@ -1547,113 +2252,172 @@ export default {
 	cursor: pointer;
 }
 
+/* Cartes de pads modernisées */
 .pads {
-	margin-bottom: 3rem;
+	margin-bottom: 2rem;
 }
 
 .mosaique .pads {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 1.5rem;
 }
 
 .pad.liste {
-	border-top: 1px solid #ddd;
-	padding: 2rem 0;
+	background: white;
+	border: 1px solid #e2e8f0;
+	border-radius: 0.75rem;
+	padding: 1rem 1.25rem;
+	margin-bottom: 0.75rem;
 	display: flex;
 	align-items: center;
+	transition: all 0.2s;
 }
 
-.pad.liste:last-child {
-	border-bottom: 1px solid #ddd;
+.pad.liste:hover {
+	border-color: #cbd5e1;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .pad.liste .fond {
-	width: 5rem;
-	height: 5rem;
-	line-height: 5rem;
-	border-radius: 50%;
+	width: 3.5rem;
+	height: 3.5rem;
+	line-height: 3.5rem;
+	border-radius: 0.5rem;
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
-	margin-right: 2rem;
+	margin-right: 1rem;
+	flex-shrink: 0;
 }
 
 .pad.liste .meta {
-	width: calc(100% - (96px + 13.5rem));
+	flex: 1;
+	min-width: 0;
 }
 
 .pad.liste .meta.pad-rejoint {
-	width: calc(100% - (48px + 10.5rem));
+	flex: 1;
 }
 
 .pad.liste .meta.deplacer {
-	width: calc(100% - (120px + 15rem));
+	flex: 1;
 }
 
 .pad.liste .meta.pad-rejoint.deplacer {
-	width: calc(100% - (72px + 12rem));
+	flex: 1;
 }
 
 .pad.liste .titre {
-	font-size: 1.8rem;
-	font-weight: 700;
+	font-size: 1rem;
+	font-weight: 600;
+	color: #0f172a;
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .pad.liste .vues,
 .pad.liste .auteur,
 .pad.liste .date {
-	font-size: 1.2rem;
-	color: #777;
+	font-size: 0.75rem;
+	color: #64748b;
+}
+
+.google-classroom-badges {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.25rem;
+	margin-left: 0.5rem;
+}
+
+.google-classroom-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	padding: 0.2rem 0.6rem;
+	color: white;
+	border-radius: 1rem;
+	font-size: 0.75rem;
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+.google-classroom-badge i.material-icons {
+	font-size: 0.875rem;
+}
+
+.pad.mosaique .google-classroom-badges {
+	margin-left: 0;
+	margin-top: 0.25rem;
 }
 
 .pad.liste .actions {
 	display: flex;
-	margin-left: 0.5rem;
+	align-items: center;
+	gap: 0.25rem;
+	margin-left: auto;
+	padding-left: 0.5rem;
 }
 
 .pad.liste .actions span {
-	margin-left: 1.5rem;
-	font-size: 24px;
-	color: #001d1d;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	font-size: 18px;
+	color: #64748b;
 	cursor: pointer;
+	border-radius: 0.375rem;
+	transition: all 0.15s;
+}
+
+.pad.liste .actions span:hover {
+	background: #f1f5f9;
+	color: #0f172a;
 }
 
 .pad.mosaique .actions span.supprimer-favori,
 .pad.liste .actions span.supprimer-favori {
-	color: #fdcc33;
+	color: #fbbf24;
 }
 
 .pad.mosaique .actions span.deplacer.actif,
 .pad.liste .actions span.deplacer.actif {
-	color: #e32f6c;
+	color: #ec4899;
 }
 
 .conteneur-pads {
-	display: flex;
-	flex-wrap: wrap;
-	padding: 0 0.75rem;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 1.5rem;
 }
 
 .pad.mosaique {
-    padding: 0 0 4rem;
-	width: calc(50% - 1.5rem);
-	height: 20rem;
-    border: 2px solid #001d1d;
-    margin: 0 0.75rem 1.5rem;
 	position: relative;
+	background: white;
+	border: 1px solid #e2e8f0;
 	border-radius: 1rem;
+	overflow: hidden;
+	transition: all 0.2s;
+}
+
+.pad.mosaique:hover {
+	border-color: #cbd5e1;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+	transform: translateY(-2px);
 }
 
 .pad.mosaique .conteneur {
 	display: flex;
 	justify-content: center;
-	align-items: center;
+	align-items: flex-end;
 	padding: 0;
 	width: 100%;
-	height: 100%;
+	height: 10rem;
 	cursor: pointer;
-	border-top-left-radius: 1rem;
-	border-top-right-radius: 1rem;
 }
 
 .pad.mosaique .conteneur.fond-personnalise {
@@ -1664,71 +2428,80 @@ export default {
 
 .pad.mosaique .meta {
 	width: 100%;
-	padding: 1.5rem;
-    background: rgba(0, 0, 0, 0.7);
-	text-align: center;
+	padding: 1rem;
+	background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.4));
+	text-align: left;
 }
 
 .pad.mosaique .titre {
 	display: block;
 	color: #fff;
-	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
-    font-size: 2rem;
+	font-size: 1rem;
 	line-height: 1.4;
-	font-weight: 700;
+	font-weight: 600;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .pad.mosaique .vues,
 .pad.mosaique .auteur,
 .pad.mosaique .date {
-    margin-top: 0.5rem;
-    color: #ddd;
-    font-size: 1.2rem;
-    display: inline-block;
-}
-
-.pad.mosaique .actions {
-	position: absolute;
-	display: flex;
-	justify-content: space-evenly;
-	align-items: center;
-	height: 4rem;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	width: 100%;
-    font-size: 24px;
-	border-top: 1px dashed #ddd;
-	line-height: 1;
-}
-
-.pad.mosaique .actions span {
-	color: #001d1d;
-	cursor: pointer;
-	text-align: center;
+	margin-top: 0.25rem;
+	color: rgba(255, 255, 255, 0.75);
+	font-size: 0.7rem;
 	display: inline-block;
 }
 
-.pad.liste .actions .supprimer,
-.pad.mosaique .actions .supprimer {
-	color: #ff6259;
+.pad.mosaique .actions {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	padding: 0.75rem;
+	background: white;
+	border-top: 1px solid #f1f5f9;
+}
+
+.pad.mosaique .actions span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	color: #64748b;
+	cursor: pointer;
+	border-radius: 0.375rem;
+	font-size: 18px;
+	transition: all 0.15s;
+}
+
+.pad.mosaique .actions span:hover {
+	background: #f1f5f9;
+	color: #0f172a;
+}
+
+.pad.liste .actions .supprimer:hover,
+.pad.mosaique .actions .supprimer:hover {
+	color: #ef4444;
+	background: #fef2f2;
 }
 
 .pad.liste .actions .admin,
 .pad.mosaique .actions .admin {
-	color: #00ced1;
+	color: #0891b2;
 }
 
 .pad .mise-a-jour {
-	width: 1rem;
-	height: 1rem;
+	width: 0.5rem;
+	height: 0.5rem;
 	display: inline-block;
 	border-radius: 50%;
-	background: #e32f6c;
+	background: #ec4899;
+	margin-right: 0.25rem;
 }
 
 .pad.mosaique .mise-a-jour {
-	margin-right: 5px;
+	margin-right: 0.25rem;
 }
 
 #import label:not(.bouton-interrupteur) {
@@ -1803,25 +2576,131 @@ export default {
 	transform: translateX(1.6rem);
 }
 
-@media screen and (max-width: 479px) {
+/* Media queries modernisées */
+@media screen and (max-width: 768px) {
+	.dashboard-header {
+		padding: 0 1rem;
+	}
+
+	.header-center {
+		display: none;
+	}
+
+	#onglets {
+		position: fixed;
+		top: 4rem;
+		left: 0;
+		width: 100%;
+		height: auto;
+		max-height: 3.5rem;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		padding: 0.5rem 1rem;
+		overflow-x: auto;
+		overflow-y: hidden;
+		border-right: none;
+		border-bottom: 1px solid #e2e8f0;
+		gap: 0.5rem;
+	}
+
+	.sidebar-section {
+		display: contents;
+	}
+
+	.section-title {
+		display: none;
+	}
+
+	#onglets .onglet {
+		flex-shrink: 0;
+		padding: 0.5rem 0.75rem;
+		margin-bottom: 0;
+		border-radius: 2rem;
+		background: #f1f5f9;
+	}
+
+	#onglets .onglet.actif {
+		background: linear-gradient(135deg, #00ced1, #00a5a8);
+		color: white;
+	}
+
+	#onglets .onglet .tab-icon {
+		display: none;
+	}
+
+	#onglets .onglet .tab-label {
+		font-size: 0.75rem;
+	}
+
+	#onglets .bouton-ajouter {
+		flex-shrink: 0;
+		padding: 0.5rem 0.75rem;
+		margin: 0;
+		font-size: 0.7rem;
+		border-radius: 2rem;
+		min-width: auto;
+	}
+
+	#onglets .bouton-ajouter i {
+		display: none;
+	}
+
+	#onglets .onglet .menu-dossier {
+		display: none !important;
+	}
+
+	#pads,
+	#google-classroom-section {
+		position: fixed;
+		top: 7.5rem;
+		left: 0;
+		width: 100%;
+		height: calc(100% - 7.5rem);
+		padding: 1rem;
+	}
+
 	#filtrer {
-		flex-wrap: wrap;
+		flex-direction: column;
+		align-items: stretch;
 	}
 
-	#filtrer .rechercher {
-		width: 100%;
-		margin-right: 0;
-		margin-bottom: 1.5rem;
-	}
-
+	#filtrer .rechercher,
 	#filtrer .filtrer {
+		max-width: none;
 		width: 100%;
-		margin-right: 0;
-		margin-bottom: 1.5rem;
 	}
 
 	#filtrer .afficher {
-		line-height: 1;
+		align-self: flex-end;
+	}
+
+	#boutons {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	#bouton-importer,
+	#bouton-creer {
+		width: 100%;
+		min-width: auto;
+	}
+
+	.pad.liste .actions {
+		flex-wrap: wrap;
+		justify-content: flex-end;
+	}
+}
+
+@media screen and (min-width: 769px) and (max-width: 1023px) {
+	#onglets {
+		width: 14rem;
+	}
+
+	#pads,
+	#google-classroom-section {
+		left: 14rem;
+		width: calc(100% - 14rem);
 	}
 }
 
@@ -1831,130 +2710,194 @@ export default {
 	}
 }
 
-@media screen and (max-width: 479px) {
-	#bouton-creer {
-		margin-right: 0;
-	}
-}
-
 @media screen and (max-width: 575px) {
-	#onglets .onglet {
-		font-size: 16px;
-	}
-
-	#pads .vide {
-		font-size: 16px;
-	}
-
-	.pad.liste .titre {
-		font-size: 16px;
-	}
-
-	.pad.mosaique .titre {
-		font-size: 1.7rem;
+	.mosaique .pads {
+		grid-template-columns: 1fr;
 	}
 }
 
-@media screen and (max-width: 599px) {
-	.pad.liste {
+/* Styles pour le mode sélection multiple */
+.selection-toggle span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: 0.5rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	color: #64748b;
+}
+
+.selection-toggle span:hover {
+	background: #f1f5f9;
+	color: #0891b2;
+}
+
+.selection-toggle span.actif {
+	background: #0891b2;
+	color: white;
+}
+
+/* Style des pads en mode sélection */
+.pad.liste.selection-mode {
+	cursor: pointer;
+}
+
+.pad.liste.selection-mode:hover {
+	background: #f8fafc;
+}
+
+.pad.liste.selected {
+	background: #e0f2fe;
+	border-color: #0891b2;
+}
+
+.pad-checkbox {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 1rem;
+	flex-shrink: 0;
+}
+
+.pad-checkbox .checkbox {
+	width: 1.5rem;
+	height: 1.5rem;
+	border: 2px solid #cbd5e1;
+	border-radius: 0.375rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: white;
+	transition: all 0.2s ease;
+}
+
+.pad-checkbox .checkbox:hover {
+	border-color: #0891b2;
+}
+
+.pad-checkbox .checkbox.checked {
+	background: #0891b2;
+	border-color: #0891b2;
+	color: white;
+}
+
+.pad-checkbox .checkbox i {
+	font-size: 1rem;
+}
+
+/* Barre d'actions flottante */
+.selection-action-bar {
+	position: fixed;
+	bottom: 2rem;
+	left: 50%;
+	transform: translateX(-50%);
+	background: white;
+	border-radius: 1rem;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+	padding: 0.75rem 1.5rem;
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+	z-index: 200;
+	animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+	from {
+		opacity: 0;
+		transform: translateX(-50%) translateY(1rem);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(-50%) translateY(0);
+	}
+}
+
+.selection-info .count {
+	font-weight: 600;
+	color: #0f172a;
+	font-size: 0.9rem;
+}
+
+.selection-actions {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.action-btn {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.625rem 1rem;
+	border: none;
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.action-btn.select-all {
+	background: #f1f5f9;
+	color: #475569;
+}
+
+.action-btn.select-all:hover {
+	background: #e2e8f0;
+}
+
+.action-btn.classroom {
+	background: linear-gradient(135deg, #0891b2 0%, #22d3d8 100%);
+	color: white;
+}
+
+.action-btn.classroom:hover {
+	box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+	transform: translateY(-1px);
+}
+
+.action-btn.cancel {
+	background: transparent;
+	color: #64748b;
+}
+
+.action-btn.cancel:hover {
+	background: #fef2f2;
+	color: #ef4444;
+}
+
+.action-btn i {
+	font-size: 1.125rem;
+}
+
+.action-btn svg {
+	flex-shrink: 0;
+}
+
+@media screen and (max-width: 768px) {
+	.selection-action-bar {
+		left: 1rem;
+		right: 1rem;
+		transform: none;
+		flex-direction: column;
+		gap: 0.75rem;
+		padding: 1rem;
+	}
+
+	.selection-actions {
 		flex-wrap: wrap;
-		padding: 2rem 0 1rem;
+		justify-content: center;
 	}
 
-	.pad.liste .fond {
-		width: 35px;
-		height: 35px;
-		line-height: 35px;
-		margin-right: 15px;
-	}
-
-	.pad.liste .meta {
-		width: calc(100% - 50px)!important;
-	}
-
-	.pad.liste .actions {
-		width: 100%;
-		justify-content: space-around;
-		margin-left: 0;
-		margin-top: 2rem;
-		padding-top: 1rem;
-		border-top: 1px dotted #ddd;
-	}
-
-	.pad.liste .actions span {
-		margin-left: 0;
-	}
-}
-
-@media screen and (max-width: 1023px) {
-	#onglets {
-		position: absolute;
-		top: 4rem;
-		left: 4rem;
-		height: 5rem;
-		width: calc(100% - 4rem);
-		display: flex;
-		align-items: center;
-		padding: 0 1.5rem;
-		border-bottom: 1px solid #ddd;
-	}
-
-	#onglets .onglet {
-		text-align: left;
-		padding-bottom: 0;
-		margin-right: 2rem;
-		margin-bottom: 0;
-		border-bottom: 3px solid transparent;
-		flex: 0 0 auto;
-	}
-
-	#onglets .onglet:hover .menu-dossier,
-	#onglets .onglet .menu-dossier {
+	.action-btn span {
 		display: none;
 	}
 
-	#onglets .bouton-ajouter {
-		min-width: 200px;
-		max-width: 250px;
-		margin-bottom: 0!important;
-	}
-
-	#pads {
-		position: absolute;
-		top: 9rem;
-		left: 4rem;
-		padding: 3rem 1.5rem;
-		height: calc(100% - 9rem);
-		width: calc(100% - 4rem);
-	}
-}
-
-@media screen and (min-width: 1024px) and (max-width: 1439px) {
-	#onglets {
-		width: 23rem;
-	}
-
-	#pads {
-		left: 27rem;
-		width: calc(100% - 27rem);
-	}
-}
-
-@media screen and (max-width: 767px) {
-	.pad.mosaique {
-		width: calc(100% - 1.5rem);
-	}
-}
-
-@media screen and (min-width: 768px) and (max-width: 1439px) {
-	.pad.mosaique {
-		width: calc(50% - 1.5rem);
-	}
-}
-
-@media screen and (min-width: 1440px) {
-	.pad.mosaique {
-		width: calc(33.333333333% - 1.5rem);
+	.action-btn {
+		padding: 0.625rem;
 	}
 }
 </style>
