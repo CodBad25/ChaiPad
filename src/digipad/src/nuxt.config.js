@@ -114,7 +114,5 @@ module.exports = {
 		nfsPadNumber: process.env.NFS_PAD_NUMBER,
 		nfsFolder: process.env.NFS_FOLDER
 	},
-	buildModules: [
-		'@nuxtjs/eslint-module'
-	]
+	buildModules: process.env.NODE_ENV === 'development' ? ['@nuxtjs/eslint-module'] : []
 }
