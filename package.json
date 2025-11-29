@@ -1,0 +1,12 @@
+{
+  "name": "chaipad",
+  "version": "1.0.0",
+  "description": "ChaiPad - Digipad avec intégration Google Classroom",
+  "scripts": {
+    "postinstall": "cd src/digipad/src && npm install && npm run build",
+    "start": "cd src/digipad/src && npm start"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
