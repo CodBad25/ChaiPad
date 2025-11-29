@@ -16,12 +16,20 @@ const WebSocket = require('ws');
 // const ws = new WebSocket("ws://board-app:50001") // Commenté pour développement local
 let db
 let db_port = 6379
-let ipUtilisateurs = new Map(); 
+let ipUtilisateurs = new Map();
 if (process.env.DB_PORT) {
 	db_port = process.env.DB_PORT
 }
 if (process.env.NODE_ENV === 'production') {
-	db = redis.createClient({ host: process.env.DB_HOST, port: db_port, password: process.env.DB_PWD })
+	// Support Scalingo REDIS_URL ou SCALINGO_REDIS_URL
+	const redisUrl = process.env.SCALINGO_REDIS_URL || process.env.REDIS_URL
+	if (redisUrl) {
+		db = redis.createClient({ url: redisUrl })
+	} else if (process.env.DB_HOST) {
+		db = redis.createClient({ host: process.env.DB_HOST, port: db_port, password: process.env.DB_PWD })
+	} else {
+		db = redis.createClient({ port: db_port })
+	}
 } else {
 	db = redis.createClient({ port: db_port })
 }
