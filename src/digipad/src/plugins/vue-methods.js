@@ -1,9 +1,15 @@
 import Vue from 'vue'
 import moment from 'moment'
-import 'moment/locale/fr'
-import 'moment/locale/es'
-import 'moment/locale/it'
-import 'moment/locale/hr'
+
+// Charger les locales de manière sécurisée
+try {
+	require('moment/locale/fr')
+	require('moment/locale/es')
+	require('moment/locale/it')
+	require('moment/locale/hr')
+} catch (e) {
+	console.warn('Moment locales not loaded:', e.message)
+}
 
 Vue.prototype.$formaterDate = function (date, langue) {
 	let dateFormattee = ''
