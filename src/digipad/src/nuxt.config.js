@@ -48,7 +48,8 @@ module.exports = {
 		{ src: '~/plugins/vue-socket-io', mode: 'client' },
 		{ src: '~/plugins/vue-methods', mode: 'client' },
 		{ src: '~/plugins/vue-masonry-css', mode: 'client' },
-		{ src: '~/plugins/matomo', mode: 'client' }
+		{ src: '~/plugins/matomo', mode: 'client' },
+		{ src: '~/plugins/panzoom.client.js', mode: 'client' }
 	],
 	modules: [
 		'nuxt-i18n'
@@ -114,14 +115,5 @@ module.exports = {
 		nfsPadNumber: process.env.NFS_PAD_NUMBER,
 		nfsFolder: process.env.NFS_FOLDER
 	},
-	buildModules: process.env.NODE_ENV === 'development' ? ['@nuxtjs/eslint-module'] : [],
-	build: {
-		transpile: ['@panzoom/panzoom'],
-		extend(config, { isServer }) {
-			if (isServer) {
-				config.externals = config.externals || []
-				config.externals.push('@panzoom/panzoom')
-			}
-		}
-	}
+	buildModules: process.env.NODE_ENV === 'development' ? ['@nuxtjs/eslint-module'] : []
 }
