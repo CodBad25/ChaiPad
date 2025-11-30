@@ -3,8 +3,15 @@ import imagesLoaded from 'imagesloaded'
 import pell from 'pell'
 import linkifyHtml from 'linkify-html'
 import saveAs from 'file-saver'
-import Panzoom from '@panzoom/panzoom'
 import ClipboardJS from 'clipboard'
+
+// Panzoom sera chargé dynamiquement côté client uniquement
+let Panzoom = null
+if (process.client) {
+	import('@panzoom/panzoom').then(module => {
+		Panzoom = module.default
+	})
+}
 import draggable from 'vuedraggable'
 import chargement from '@/components/chargement.vue'
 import emojis from '@/components/emojis.vue'
@@ -1967,21 +1974,23 @@ export default {
 							if (item.type === 'image' || item.type === 'lien-image') {
 								document.querySelector('#' + imageId + ' img').style.maxHeight = document.querySelector('#' + panel.id + ' .jsPanel-content').clientHeight + 'px'
 								const image = document.querySelector('#' + imageId)
-								// eslint-disable-next-line no-undef
-								const panzoom = Panzoom(image, {
-									maxScale: 10,
-									minScale: 0.5,
-									panOnlyWhenZoomed: true
-								})
-								image.parentElement.addEventListener('wheel', panzoom.zoomWithWheel)
-								panel.addControl({
-									html: '<span class="material-icons">adjust</span>',
-									name: 'dezoom',
-									handler: function () {
-										document.querySelector('#' + imageId + ' img').style.maxHeight = document.querySelector('#' + panel.id + ' .jsPanel-content').clientHeight + 'px'
-										panzoom.reset()
-									}
-								})
+								// Panzoom est chargé dynamiquement côté client
+								if (Panzoom) {
+									const panzoom = Panzoom(image, {
+										maxScale: 10,
+										minScale: 0.5,
+										panOnlyWhenZoomed: true
+									})
+									image.parentElement.addEventListener('wheel', panzoom.zoomWithWheel)
+									panel.addControl({
+										html: '<span class="material-icons">adjust</span>',
+										name: 'dezoom',
+										handler: function () {
+											document.querySelector('#' + imageId + ' img').style.maxHeight = document.querySelector('#' + panel.id + ' .jsPanel-content').clientHeight + 'px'
+											panzoom.reset()
+										}
+									})
+								}
 							} else if (item.type === 'audio') {
 								panel.resize({
 									width: largeurPanneau,

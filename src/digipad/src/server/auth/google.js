@@ -67,6 +67,35 @@ function configureGoogleAuth(db) {
 					db.hgetall(`utilisateurs:${identifiant}`, async (err, user) => {
 						if (err) return done(err)
 
+						// Si l'utilisateur n'existe pas avec la nouvelle clé, le recréer
+						if (!user) {
+							const date = new Date().toISOString()
+							utilisateur = {
+								id: identifiant,
+								identifiant: identifiant,
+								nom: nom,
+								email: email,
+								googleId: googleId,
+								googleAccessToken: encrypt(accessToken),
+								googleRefreshToken: encrypt(refreshToken),
+								googleTokenExpiry: Date.now() + 3600000,
+								statut: 'utilisateur',
+								motdepasse: '',
+								date: date,
+								langue: 'fr',
+								affichage: 'liste',
+								filtre: 'date-asc'
+							}
+
+							db.hmset(`utilisateurs:${identifiant}`, utilisateur, (err) => {
+								if (err) return done(err)
+								utilisateur.googleAccessToken = accessToken
+								utilisateur.googleRefreshToken = refreshToken
+								done(null, utilisateur)
+							})
+							return
+						}
+
 						utilisateur = user
 
 						// Mettre à jour les tokens
