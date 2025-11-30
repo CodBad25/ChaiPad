@@ -905,6 +905,11 @@ export default {
 	},
 	watchQuery: ['page'],
 	created () {
+		// Protection si le pad n'est pas chargé correctement
+		if (!this.pad) {
+			this.$router.push('/')
+			return
+		}
 		if (this.pad.affichage === 'colonnes') {
 			this.definirColonnes(this.blocs)
 		}
@@ -946,6 +951,10 @@ export default {
 		}
 	},
 	mounted () {
+		// Protection si le pad n'est pas chargé correctement
+		if (!this.pad) {
+			return
+		}
 		imagesLoaded('#pad', { background: true }, function () {
 			document.documentElement.setAttribute('lang', this.langue)
 			document.addEventListener('mousedown', this.surlignerBloc, false)

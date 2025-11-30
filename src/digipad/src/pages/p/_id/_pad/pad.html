@@ -1,4 +1,4 @@
-<main id="page" :class="pad.affichage">
+<main id="page" :class="pad ? pad.affichage : ''" v-if="pad">
 	<header :class="{'pleine-largeur': pad.listeUtilisateurs && pad.listeUtilisateurs === 'desactivee'}">
 		<span id="conteneur-logo">
 			<span id="logo" />
@@ -1208,4 +1208,9 @@
 	<div id="masque" />
 
 	<chargement :chargement="chargement" v-if="chargement" />
+</main>
+<main id="page" v-else>
+	<div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column;">
+		<p style="font-size: 18px; color: #666;">Chargement en cours...</p>
+	</div>
 </main>
