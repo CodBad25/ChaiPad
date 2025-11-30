@@ -608,9 +608,12 @@ export default {
 			headers: { 'Content-Type': 'application/json' }
 		})
 		if (data === 'erreur_pad' && context.store.state.statut === 'utilisateur') {
-			context.redirect('/u/' + context.store.state.identifiant)
+			return context.redirect('/u/' + context.store.state.identifiant)
 		} else if (data === 'erreur_pad' && (context.store.state.statut === 'invite' || context.store.state.statut === 'auteur' || context.store.state.statut === '')) {
-			context.redirect('/')
+			return context.redirect('/')
+		} else if (!data || !data.pad) {
+			// Sécurité : si les données sont invalides, rediriger vers l'accueil
+			return context.redirect('/')
 		} else {
 			return {
 				pad: data.pad,
