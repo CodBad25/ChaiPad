@@ -742,7 +742,8 @@ export default {
 			return this.$store.state.langues
 		},
 		admin () {
-			return this.pad.identifiant === this.identifiant || this.pad.admins.includes(this.identifiant)
+			if (!this.pad) return false
+			return this.pad.identifiant === this.identifiant || (this.pad.admins && this.pad.admins.includes(this.identifiant))
 		},
 		statut () {
 			return this.$store.state.statut

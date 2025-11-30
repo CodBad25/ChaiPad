@@ -18,7 +18,7 @@ function configureGoogleAuth(db) {
 
 	// Désérialisation de l'utilisateur depuis la session
 	passport.deserializeUser((identifiant, done) => {
-		db.hgetall(`utilisateur:${identifiant}`, (err, utilisateur) => {
+		db.hgetall(`utilisateurs:${identifiant}`, (err, utilisateur) => {
 			if (err) return done(err)
 			if (!utilisateur) return done(null, false)
 
@@ -64,7 +64,7 @@ function configureGoogleAuth(db) {
 
 				if (identifiant) {
 					// Utilisateur existant - mettre à jour les tokens
-					db.hgetall(`utilisateur:${identifiant}`, async (err, user) => {
+					db.hgetall(`utilisateurs:${identifiant}`, async (err, user) => {
 						if (err) return done(err)
 
 						utilisateur = user
@@ -79,7 +79,7 @@ function configureGoogleAuth(db) {
 							updates.googleRefreshToken = encrypt(refreshToken)
 						}
 
-						db.hmset(`utilisateur:${identifiant}`, updates, (err) => {
+						db.hmset(`utilisateurs:${identifiant}`, updates, (err) => {
 							if (err) return done(err)
 							utilisateur.googleAccessToken = accessToken
 							utilisateur.googleRefreshToken = refreshToken || utilisateur.googleRefreshToken
@@ -89,8 +89,10 @@ function configureGoogleAuth(db) {
 				} else {
 					// Nouvel utilisateur - créer le compte
 					const nouvelIdentifiant = 'u' + Math.random().toString(16).slice(3)
+					const date = new Date().toISOString()
 
 					utilisateur = {
+						id: nouvelIdentifiant,
 						identifiant: nouvelIdentifiant,
 						nom: nom,
 						email: email,
@@ -99,26 +101,24 @@ function configureGoogleAuth(db) {
 						googleRefreshToken: encrypt(refreshToken),
 						googleTokenExpiry: Date.now() + 3600000,
 						statut: 'utilisateur',
-						pads: JSON.stringify([]),
-						classes: JSON.stringify([])
+						motdepasse: '',
+						date: date,
+						langue: 'fr',
+						affichage: 'liste',
+						filtre: 'date-asc'
 					}
 
-					// Sauvegarder l'utilisateur dans Redis
-					db.hmset(`utilisateur:${nouvelIdentifiant}`, utilisateur, (err) => {
+					// Sauvegarder l'utilisateur dans Redis (format Digipad standard)
+					db.hmset(`utilisateurs:${nouvelIdentifiant}`, utilisateur, (err) => {
 						if (err) return done(err)
 
 						// Créer l'index googleId -> identifiant
 						db.set(`google:${googleId}`, nouvelIdentifiant, (err) => {
 							if (err) return done(err)
 
-							// Ajouter à la liste des utilisateurs
-							db.sadd('utilisateurs', nouvelIdentifiant, (err) => {
-								if (err) return done(err)
-
-								utilisateur.googleAccessToken = accessToken
-								utilisateur.googleRefreshToken = refreshToken
-								done(null, utilisateur)
-							})
+							utilisateur.googleAccessToken = accessToken
+							utilisateur.googleRefreshToken = refreshToken
+							done(null, utilisateur)
 						})
 					})
 				}
